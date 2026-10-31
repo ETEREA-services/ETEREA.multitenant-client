@@ -1,0 +1,13 @@
+{
+  "name": "contable-data-access",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/contable-data-access/src",
+  "prefix": "et",
+  "projectType": "library",
+  "tags": ["type:data-access", "scope:contable"],
+  "targets": {
+    "lint": {
+      "executor": "@nx/eslint:lint"
+    }
+  }
+}

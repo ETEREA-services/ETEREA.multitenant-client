@@ -1,0 +1,226 @@
+:host {
+  display: block;
+}
+
+.coeficientes__alerta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1rem 1.25rem;
+  margin-bottom: 1rem;
+  border: 1px solid var(--et-danger);
+  border-radius: var(--et-radius);
+  background: var(--et-danger-soft);
+}
+
+.coeficientes__alerta p {
+  margin: 0;
+}
+
+.coeficientes__alerta .et-muted {
+  margin-top: 0.25rem;
+  font-size: 0.75rem;
+}
+
+.coeficientes__aviso {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.85rem 1.25rem;
+  margin-bottom: 1rem;
+  border: 1px solid var(--et-primary);
+  border-radius: var(--et-radius);
+  background: var(--et-primary-soft);
+}
+
+.coeficientes__aviso p {
+  margin: 0;
+  color: var(--et-text);
+  font-size: 0.85rem;
+}
+
+.coeficientes__nota {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.25rem;
+  margin-bottom: 1rem;
+  border: 1px solid var(--et-line);
+  border-radius: var(--et-radius);
+  background: var(--et-surface-soft);
+}
+
+.coeficientes__nota p {
+  margin: 0;
+  font-size: 0.8rem;
+}
+
+.coeficientes__barra {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: end;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid var(--et-line);
+}
+
+.coeficientes__barra > p {
+  margin: 0;
+  font-size: 0.78rem;
+}
+
+.coeficientes__anio {
+  display: flex;
+  align-items: end;
+  gap: 0.5rem;
+}
+
+.coeficientes__anio-input {
+  width: 8rem;
+}
+
+.coeficientes__anios {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.75rem 1.25rem;
+  border-bottom: 1px solid var(--et-line);
+}
+
+.coeficientes__anios .et-muted {
+  margin-right: 0.25rem;
+  font-size: 0.75rem;
+}
+
+.coeficientes__estado {
+  padding: 1.25rem;
+}
+
+.coeficientes__estado p {
+  margin: 0;
+}
+
+.coeficientes__tabla td:first-child {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+}
+
+.coeficientes__mes {
+  color: var(--et-muted);
+  font-family: var(--et-font-mono);
+  font-size: 0.72rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.coeficientes__input {
+  width: 9rem;
+  font-family: var(--et-font-mono);
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+
+.coeficientes__error {
+  margin: 0.25rem 0 0;
+  font-size: 0.72rem;
+}
+
+.coeficientes__fila--modificada {
+  background: var(--et-primary-soft);
+}
+
+.coeficientes__acciones {
+  text-align: right;
+  white-space: nowrap;
+}
+
+.coeficientes__acciones .et-btn {
+  gap: 0.35rem;
+}
+
+.coeficientes__pie {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1rem 1.25rem;
+  border-top: 1px solid var(--et-line);
+}
+
+.coeficientes__pie > p {
+  margin: 0;
+  font-size: 0.78rem;
+}
+
+.coeficientes__pie-acciones {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.coeficientes__overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.25rem;
+  background: rgb(0 0 0 / 45%);
+}
+
+.coeficientes__dialog {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  width: min(28rem, 100%);
+  padding: 1.4rem;
+  border: 1px solid var(--et-line);
+  border-radius: var(--et-radius-lg);
+  background: var(--et-surface);
+  box-shadow: var(--et-shadow-lg);
+}
+
+.coeficientes__dialog h2 {
+  margin: 0;
+  font-family: var(--et-font-display);
+  font-size: 1.15rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+.coeficientes__dialog p {
+  margin: 0;
+  font-size: 0.85rem;
+  line-height: 1.5;
+}
+
+.coeficientes__dialog-acciones {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+}
+
+@media (max-width: 720px) {
+  .coeficientes__barra,
+  .coeficientes__pie {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .coeficientes__tabla td:first-child {
+    display: block;
+  }
+
+  .coeficientes__input {
+    width: 100%;
+  }
+
+  .coeficientes__pie-acciones {
+    justify-content: flex-end;
+  }
+}

@@ -1,0 +1,13 @@
+<et-shell
+  appName="administrador"
+  [showTenant]="false"
+  [navGroups]="navGroups"
+  [userName]="userName()"
+  [userRole]="userRole()"
+  [userInitials]="userInitials()"
+  [envLabel]="envLabel()"
+  (changePassword)="irACambiarPassword()"
+  (logout)="salir()"
+>
+  <router-outlet />
+</et-shell>

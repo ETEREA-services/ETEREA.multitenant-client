@@ -1,0 +1,246 @@
+<et-page-header
+  eyebrow="Accesos"
+  title="Asignaciones"
+  description="Vinculá cada usuario con las empresas y los negocios a los que puede acceder."
+>
+  <button
+    class="et-btn et-btn--ghost"
+    type="button"
+    (click)="recargar()"
+    [disabled]="cargandoInicial() || cargandoAsignaciones()"
+  >
+    <et-icon name="swap" [size]="16" />
+    {{ cargandoInicial() || cargandoAsignaciones() ? 'Actualizando…' : 'Actualizar' }}
+  </button>
+</et-page-header>
+
+@if (error(); as mensaje) {
+  <div class="et-card asignaciones__error" role="alert">
+    <p class="et-error">{{ mensaje }}</p>
+    <button class="et-btn et-btn--sm" type="button" (click)="recargar()">Reintentar</button>
+  </div>
+}
+
+<div class="asignaciones__layout">
+  <aside class="et-card asignaciones__usuarios">
+    <div class="asignaciones__usuarios-header">
+      <span class="et-eyebrow">Usuarios</span>
+      <span class="et-muted">{{ usuarios().length }}</span>
+    </div>
+
+    <label class="et-field">
+      <span class="et-label">Buscar</span>
+      <input
+        class="et-input"
+        type="search"
+        placeholder="Nombre, login o email"
+        [value]="filtroUsuarios()"
+        (input)="actualizarFiltro($event)"
+      />
+    </label>
+
+    @if (cargandoInicial() && usuarios().length === 0) {
+      <p class="et-muted asignaciones__estado">Cargando usuarios…</p>
+    } @else if (usuariosFiltrados().length === 0) {
+      <p class="et-muted asignaciones__estado">No hay usuarios que coincidan.</p>
+    } @else {
+      <ul class="asignaciones__lista">
+        @for (usuario of usuariosFiltrados(); track usuario.usuarioId) {
+          <li>
+            <button
+              type="button"
+              class="asignaciones__usuario"
+              [class.is-active]="usuarioSeleccionado()?.usuarioId === usuario.usuarioId"
+              (click)="seleccionarUsuario(usuario)"
+            >
+              <span class="asignaciones__avatar" aria-hidden="true">{{ iniciales(usuario) }}</span>
+              <span class="asignaciones__usuario-texto">
+                <strong>{{ usuario.nombre }}</strong>
+                <small>{{ usuario.login }}</small>
+              </span>
+              @if (!usuario.activo) {
+                <span class="et-badge et-badge--danger">Inactivo</span>
+              }
+            </button>
+          </li>
+        }
+      </ul>
+    }
+  </aside>
+
+  <section class="asignaciones__contenido">
+    @if (!usuarioSeleccionado()) {
+      <div class="et-card">
+        <et-empty-state
+          icon="user"
+          title="Elegí un usuario"
+          description="Seleccioná un usuario de la lista para administrar sus empresas y negocios."
+        />
+      </div>
+    } @else if (cargandoAsignaciones() && asignacionesEmpresa().length === 0) {
+      <div class="et-card asignaciones__estado">
+        <p class="et-muted">Cargando asignaciones…</p>
+      </div>
+    } @else {
+      <div class="asignaciones__resumen">
+        <article class="et-card asignaciones__metrica">
+          <span class="et-eyebrow">Empresas asignadas</span>
+          <strong>{{ empresasAsignadas() }}</strong>
+          <small class="et-muted">de {{ empresas().length }}</small>
+        </article>
+        <article class="et-card asignaciones__metrica">
+          <span class="et-eyebrow">Negocios asignados</span>
+          <strong>{{ negociosAsignados() }}</strong>
+          <small class="et-muted">en todas las empresas</small>
+        </article>
+      </div>
+
+      @if (empresas().length === 0) {
+        <div class="et-card">
+          <et-empty-state
+            icon="building"
+            title="No hay empresas registradas"
+            description="Cuando se registren empresas van a aparecer acá para asignarlas."
+          />
+        </div>
+      } @else {
+        <div class="asignaciones__empresas">
+          @for (empresa of empresas(); track empresa.empresaId) {
+            <article
+              class="et-card asignaciones__empresa"
+              [class.is-asignada]="empresaAsignada(empresa.empresaId)"
+            >
+              <header class="asignaciones__empresa-header">
+                <div class="asignaciones__empresa-info">
+                  <span class="asignaciones__empresa-icono">
+                    <et-icon name="building" [size]="18" />
+                  </span>
+                  <div class="asignaciones__empresa-texto">
+                    <h2>{{ empresa.nombre }}</h2>
+                    <p class="et-muted">{{ empresa.empresaId }}</p>
+                  </div>
+                </div>
+
+                <div class="asignaciones__empresa-acciones">
+                  @if (empresaAsignada(empresa.empresaId)) {
+                    <span class="et-badge et-badge--success">Asignada</span>
+                  } @else if (empresaConAsignacion(empresa.empresaId)) {
+                    <span class="et-badge et-badge--warn">Inactiva</span>
+                  } @else {
+                    <span class="et-badge et-badge--outline">Sin asignar</span>
+                  }
+
+                  <button
+                    class="asignaciones__switch"
+                    type="button"
+                    role="switch"
+                    [attr.aria-checked]="empresaAsignada(empresa.empresaId)"
+                    [attr.aria-label]="
+                      empresaAsignada(empresa.empresaId) ? 'Desasignar empresa' : 'Asignar empresa'
+                    "
+                    [disabled]="estaGuardando(claveEmpresa(empresa.empresaId))"
+                    (click)="toggleEmpresa(empresa)"
+                  >
+                    <span class="asignaciones__switch-bola"></span>
+                  </button>
+
+                  @if (empresaAsignada(empresa.empresaId)) {
+                    <button
+                      class="et-btn et-btn--ghost et-btn--sm"
+                      type="button"
+                      (click)="expandirEmpresa(empresa)"
+                    >
+                      <et-icon
+                        [name]="estaExpandida(empresa.empresaId) ? 'chevron-down' : 'chevron-right'"
+                        [size]="16"
+                      />
+                      {{ estaExpandida(empresa.empresaId) ? 'Ocultar negocios' : 'Ver negocios' }}
+                    </button>
+                  }
+                </div>
+              </header>
+
+              @if (!empresaAsignada(empresa.empresaId)) {
+                <p class="asignaciones__aviso">
+                  Asigná la empresa para ver y habilitar sus negocios.
+                </p>
+              } @else if (estaExpandida(empresa.empresaId)) {
+                @if (cargandoNegociosDe(empresa.empresaId)) {
+                  <p class="et-muted asignaciones__estado">Cargando negocios…</p>
+                } @else if (negociosDe(empresa.empresaId).length === 0) {
+                  <p class="et-muted asignaciones__estado">
+                    Esta empresa no tiene negocios registrados.
+                  </p>
+                } @else {
+                  <ul class="asignaciones__negocios">
+                    @for (negocio of negociosDe(empresa.empresaId); track negocio.negocioId) {
+                      <li class="asignaciones__negocio">
+                        <div class="asignaciones__negocio-info">
+                          <strong>{{ negocio.nombre }}</strong>
+                          <small class="et-muted">Tenant {{ negocio.tenantId }}</small>
+                        </div>
+
+                        <div class="asignaciones__negocio-acciones">
+                          @if (negocioAsignado(negocio.negocioId)) {
+                            <span class="et-badge et-badge--success">Asignado</span>
+                          } @else if (negocioConAsignacion(negocio.negocioId)) {
+                            <span class="et-badge et-badge--warn">Inactivo</span>
+                          } @else {
+                            <span class="et-badge et-badge--outline">Sin asignar</span>
+                          }
+
+                          <button
+                            class="asignaciones__switch"
+                            type="button"
+                            role="switch"
+                            [attr.aria-checked]="negocioAsignado(negocio.negocioId)"
+                            [attr.aria-label]="
+                              negocioAsignado(negocio.negocioId)
+                                ? 'Desasignar negocio'
+                                : 'Asignar negocio'
+                            "
+                            [disabled]="estaGuardando(claveNegocio(negocio.negocioId))"
+                            (click)="toggleNegocio(empresa, negocio)"
+                          >
+                            <span class="asignaciones__switch-bola"></span>
+                          </button>
+                        </div>
+                      </li>
+                    }
+                  </ul>
+                }
+              }
+            </article>
+          }
+        </div>
+      }
+    }
+  </section>
+</div>
+
+@if (confirmacion(); as conf) {
+  <div class="asignaciones__overlay">
+    <div
+      class="asignaciones__dialog"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="asignaciones-titulo"
+    >
+      <header class="asignaciones__dialog-header">
+        <h2 id="asignaciones-titulo">Desasignar empresa</h2>
+        <p class="et-muted">
+          Se va a desasignar <strong>{{ conf.empresa.nombre }}</strong> de
+          <strong>{{ usuarioSeleccionado()?.nombre }}</strong
+          >. También se van a desactivar {{ conf.negociosActivos }} negocio(s) de esa empresa.
+        </p>
+      </header>
+
+      <div class="asignaciones__dialog-acciones">
+        <button class="et-btn" type="button" (click)="cancelarDesactivarEmpresa()">Cancelar</button>
+        <button class="et-btn et-btn--danger" type="button" (click)="confirmarDesactivarEmpresa()">
+          Desasignar empresa
+        </button>
+      </div>
+    </div>
+  </div>
+}

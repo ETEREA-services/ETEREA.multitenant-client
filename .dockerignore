@@ -1,0 +1,8 @@
+node_modules
+dist
+coverage
+.angular
+.nx
+.git
+graphify-out
+*.log

@@ -1,0 +1,237 @@
+<et-page-header
+  eyebrow="Maestros"
+  title="Coeficientes de inflación"
+  description="Coeficientes mensuales del negocio activo, organizados por año. Los meses sin cargar quedan vacíos y no se confunden con el valor cero."
+>
+  <button
+    class="et-btn et-btn--ghost"
+    type="button"
+    (click)="actualizar()"
+    [disabled]="cargando() || guardando()"
+  >
+    <et-icon name="swap" [size]="16" />
+    {{ cargando() ? 'Actualizando…' : 'Actualizar' }}
+  </button>
+</et-page-header>
+
+@if (error(); as mensaje) {
+  <div class="coeficientes__alerta" role="alert">
+    <div>
+      <p class="et-error">{{ mensaje }}</p>
+      @if (sinPermiso()) {
+        <p class="et-muted">
+          Tu usuario no tiene asignado este negocio o le falta el permiso necesario.
+        </p>
+      }
+    </div>
+    <button class="et-btn et-btn--sm" type="button" (click)="actualizar()">Reintentar</button>
+  </div>
+}
+
+@if (aviso(); as mensaje) {
+  <div class="coeficientes__aviso" role="status">
+    <p>{{ mensaje }}</p>
+    <button
+      class="et-btn et-btn--icon et-btn--sm"
+      type="button"
+      aria-label="Cerrar aviso"
+      (click)="cerrarAviso()"
+    >
+      <et-icon name="close" [size]="16" />
+    </button>
+  </div>
+}
+
+@if (!esAdministrador()) {
+  <div class="coeficientes__nota" role="note">
+    <et-icon name="lock" [size]="16" />
+    <p class="et-muted">
+      Podés consultar los coeficientes, pero sólo un administrador puede modificarlos.
+    </p>
+  </div>
+}
+
+<div class="et-card">
+  <div class="coeficientes__barra">
+    <div class="coeficientes__anio">
+      <button
+        class="et-btn et-btn--icon"
+        type="button"
+        aria-label="Año anterior"
+        (click)="cambiarAnio(anho() - 1)"
+        [disabled]="anho() <= 1900 || cargando() || guardando()"
+      >
+        <et-icon name="chevron-left" [size]="18" />
+      </button>
+
+      <label class="et-field coeficientes__anio-input">
+        <span class="et-label">Año</span>
+        <input
+          class="et-input"
+          type="number"
+          min="1900"
+          max="2100"
+          step="1"
+          [value]="anho()"
+          (change)="cambiarAnioDesdeInput($event)"
+          [disabled]="cargando() || guardando()"
+        />
+      </label>
+
+      <button
+        class="et-btn et-btn--icon"
+        type="button"
+        aria-label="Año siguiente"
+        (click)="cambiarAnio(anho() + 1)"
+        [disabled]="anho() >= 2100 || cargando() || guardando()"
+      >
+        <et-icon name="chevron-right" [size]="18" />
+      </button>
+    </div>
+
+    <p class="et-muted" role="status">
+      {{ cargados() }} de 12 meses con valor
+      @if (cargando()) {
+        · Cargando…
+      }
+    </p>
+  </div>
+
+  @if (aniosDisponibles().length > 0) {
+    <div class="coeficientes__anios">
+      <span class="et-muted">Años con datos:</span>
+      @for (anioDisponible of aniosDisponibles(); track anioDisponible) {
+        <button
+          class="et-btn et-btn--sm"
+          type="button"
+          [class.et-btn--primary]="anioDisponible === anho()"
+          [disabled]="cargando() || guardando()"
+          (click)="cambiarAnio(anioDisponible)"
+        >
+          {{ anioDisponible }}
+        </button>
+      }
+    </div>
+  }
+
+  @if (cargando() && cargados() === 0) {
+    <div class="coeficientes__estado">
+      <p class="et-muted">Cargando coeficientes…</p>
+    </div>
+  } @else {
+    <div class="et-table-wrap">
+      <table class="et-table coeficientes__tabla">
+        <thead>
+          <tr>
+            <th>Mes</th>
+            <th>Coeficiente</th>
+            <th>Estado</th>
+            <th><span class="et-sr-only">Acciones</span></th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (fila of filas(); track fila.mes) {
+            <tr [class.coeficientes__fila--modificada]="fila.modificado">
+              <td>
+                <span class="coeficientes__mes">{{ dosDigitos(fila.mes) }}</span>
+                <strong>{{ fila.nombre }}</strong>
+              </td>
+              <td>
+                <input
+                  class="et-input coeficientes__input"
+                  type="text"
+                  inputmode="decimal"
+                  autocomplete="off"
+                  [ngModel]="fila.valor"
+                  (ngModelChange)="actualizarValor(fila.mes, $event)"
+                  (blur)="formatearFila(fila.mes)"
+                  [disabled]="!esAdministrador() || guardando() || cargando()"
+                  [attr.aria-label]="'Coeficiente de ' + fila.nombre"
+                  [attr.aria-invalid]="fila.error ? 'true' : null"
+                />
+                @if (fila.error) {
+                  <p class="et-error coeficientes__error" role="alert">{{ fila.error }}</p>
+                }
+              </td>
+              <td>
+                <span
+                  class="et-badge"
+                  [class.et-badge--success]="fila.cargado && !fila.modificado"
+                  [class.et-badge--warn]="fila.modificado"
+                  [class.et-badge--outline]="!fila.cargado && !fila.modificado"
+                >
+                  {{ estadoFila(fila) }}
+                </span>
+              </td>
+              <td class="coeficientes__acciones">
+                @if (esAdministrador()) {
+                  <button
+                    class="et-btn et-btn--sm et-btn--ghost"
+                    type="button"
+                    (click)="limpiarMes(fila.mes)"
+                    [disabled]="guardando() || cargando() || fila.valor.trim() === ''"
+                  >
+                    <et-icon name="close" [size]="14" />
+                    Limpiar
+                  </button>
+                }
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+
+    <div class="coeficientes__pie">
+      <p class="et-muted">
+        @if (hayCambios()) {
+          {{ modificados().length }}
+          {{ modificados().length === 1 ? 'mes modificado' : 'meses modificados' }} sin guardar
+        } @else {
+          Sin cambios pendientes
+        }
+      </p>
+      <div class="coeficientes__pie-acciones">
+        <button
+          class="et-btn et-btn--ghost"
+          type="button"
+          (click)="descartar()"
+          [disabled]="!hayCambios() || guardando()"
+        >
+          Descartar
+        </button>
+        <button
+          class="et-btn et-btn--primary"
+          type="button"
+          (click)="guardar()"
+          [disabled]="!puedeGuardar()"
+        >
+          <et-icon name="check" [size]="16" />
+          {{ guardando() ? 'Guardando…' : 'Guardar' }}
+        </button>
+      </div>
+    </div>
+  }
+</div>
+
+@if (confirmacion(); as actual) {
+  <div class="coeficientes__overlay">
+    <div
+      class="coeficientes__dialog"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="coeficientes-confirmar-titulo"
+    >
+      <h2 id="coeficientes-confirmar-titulo">{{ actual.titulo }}</h2>
+      <p class="et-muted">{{ actual.mensaje }}</p>
+      <div class="coeficientes__dialog-acciones">
+        <button class="et-btn et-btn--ghost" type="button" (click)="cancelarConfirmacion()">
+          Cancelar
+        </button>
+        <button class="et-btn et-btn--primary" type="button" (click)="confirmarAccion()">
+          {{ actual.etiqueta }}
+        </button>
+      </div>
+    </div>
+  </div>
+}

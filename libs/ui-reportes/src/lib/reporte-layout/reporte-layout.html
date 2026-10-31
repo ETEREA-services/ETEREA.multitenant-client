@@ -1,0 +1,82 @@
+<et-page-header
+  [eyebrow]="eyebrow()"
+  [title]="titulo()"
+  [description]="descripcion()"
+>
+  <ng-content select="[reporteFiltros]" />
+
+  <button
+    class="et-btn et-btn--ghost"
+    type="button"
+    [disabled]="cargando()"
+    (click)="actualizar.emit()"
+  >
+    <et-icon name="swap" [size]="16" />
+    {{ cargando() ? 'Actualizando…' : 'Actualizar' }}
+  </button>
+
+  <button
+    class="et-btn"
+    type="button"
+    [disabled]="descargando() || !datos()"
+    (click)="imprimir.emit()"
+  >
+    <et-icon name="printer" [size]="16" />
+    Imprimir
+  </button>
+
+  <button
+    class="et-btn et-btn--primary"
+    type="button"
+    [disabled]="descargando() || !datos()"
+    (click)="descargar.emit()"
+  >
+    <et-icon name="download" [size]="16" />
+    {{ descargando() ? 'Generando…' : 'Descargar PDF' }}
+  </button>
+</et-page-header>
+
+@if (error(); as mensaje) {
+  <div class="reporte__alerta" role="alert">
+    <div>
+      <p class="et-error">{{ mensaje }}</p>
+      @if (sinPermiso()) {
+        <p class="et-muted">
+          Tu usuario no tiene asignado este negocio o le falta el permiso necesario.
+        </p>
+      }
+    </div>
+    <button class="et-btn et-btn--sm" type="button" (click)="reintentar.emit()">
+      Reintentar
+    </button>
+  </div>
+}
+
+@if (sinPermiso() && !error()) {
+  <et-empty-state
+    icon="lock"
+    title="Sin permiso"
+    description="No podés ver el listado de este negocio con tu usuario actual."
+  />
+} @else if (cargando() && !datos()) {
+  <section class="et-card reporte__estado" aria-live="polite">
+    <p class="et-muted">Generando el listado…</p>
+  </section>
+} @else if (datos(); as reporte) {
+  @if (reporte.filas.length === 0) {
+    <et-empty-state
+      icon="file"
+      title="El plan de cuentas está vacío"
+      description="El negocio activo no tiene cuentas cargadas. Creá la primera desde Plan de cuentas."
+    />
+  } @else {
+    <et-reporte-preview [datos]="reporte" />
+  }
+} @else {
+  <section class="et-card reporte__estado">
+    <p class="et-muted">Todavía no se generó el listado.</p>
+    <button class="et-btn et-btn--primary" type="button" (click)="actualizar.emit()">
+      Generar listado
+    </button>
+  </section>
+}

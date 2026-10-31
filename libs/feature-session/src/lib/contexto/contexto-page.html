@@ -1,0 +1,34 @@
+<et-page-header
+  eyebrow="Contexto"
+  title="Elegí empresa y negocio"
+  description="Primero elegí la empresa y después el negocio con el que vas a trabajar. El contexto se guarda sólo en esta solapa del navegador."
+>
+  @if (hayContexto()) {
+    <button class="et-btn" type="button" (click)="volver()">Volver al sistema</button>
+  }
+  <button class="et-btn et-btn--danger" type="button" (click)="salir()">Cerrar sesión</button>
+</et-page-header>
+
+<div class="et-card contexto-panel">
+  <et-contexto-selector
+    [empresas]="empresas()"
+    [empresaActivaId]="empresaActivaId()"
+    [negocioActivoId]="negocioActivoId()"
+    (seleccionar)="elegir($event)"
+    (salir)="salir()"
+  />
+</div>
+
+<div class="contexto-notes">
+  <article class="et-card contexto-note">
+    <span class="contexto-note__icon"><et-icon name="layers" [size]="17" /></span>
+    <h2>Contexto por solapa</h2>
+    <p>Si abrís el sistema en otra pestaña podés elegir un negocio distinto sin afectar esta.</p>
+  </article>
+
+  <article class="et-card contexto-note">
+    <span class="contexto-note__icon"><et-icon name="swap" [size]="17" /></span>
+    <h2>Cambio en cualquier momento</h2>
+    <p>Desde la barra superior podés volver a elegir empresa y negocio cuando lo necesites.</p>
+  </article>
+</div>

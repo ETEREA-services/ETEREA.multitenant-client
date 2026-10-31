@@ -1,0 +1,358 @@
+<et-page-header
+  eyebrow="Organización"
+  title="Negocios"
+  description="Negocios de la empresa seleccionada y sus conexiones a base de datos y backend."
+>
+  <button
+    class="et-btn et-btn--primary"
+    type="button"
+    (click)="abrirAlta()"
+    [disabled]="!empresaSeleccionada()"
+  >
+    <et-icon name="plus" [size]="16" />
+    Nuevo negocio
+  </button>
+</et-page-header>
+
+@if (error(); as mensaje) {
+  <div class="negocios__error" role="alert">
+    <p class="et-error">{{ mensaje }}</p>
+    <button class="et-btn et-btn--sm" type="button" (click)="cargar()">Reintentar</button>
+  </div>
+}
+
+<div class="et-card">
+  <div class="negocios__barra">
+    <div class="negocios__filtros">
+      <label class="et-field negocios__empresa-filtro">
+        <span class="et-label">
+          Empresa
+          <span class="negocios__requerido" aria-hidden="true">*</span>
+        </span>
+        <select
+          class="et-select"
+          [ngModel]="empresaSeleccionada()"
+          (ngModelChange)="seleccionarEmpresa($event)"
+          [ngModelOptions]="{ standalone: true }"
+        >
+          <option value="">Seleccioná una empresa…</option>
+          @for (empresa of empresas(); track empresa.empresaId) {
+            <option [value]="empresa.empresaId">{{ empresa.nombre }}</option>
+          }
+        </select>
+      </label>
+      <label class="et-field negocios__buscador">
+        <span class="et-label">Buscar</span>
+        <input
+          class="et-input"
+          type="search"
+          placeholder="Nombre, TenantID o base de datos"
+          [disabled]="!empresaSeleccionada()"
+          [ngModel]="filtro()"
+          (ngModelChange)="actualizarFiltro($event)"
+          [ngModelOptions]="{ standalone: true }"
+        />
+      </label>
+    </div>
+    <button class="et-btn et-btn--ghost" type="button" (click)="cargar()" [disabled]="cargando()">
+      <et-icon name="swap" [size]="16" />
+      {{ cargando() ? 'Actualizando…' : 'Actualizar' }}
+    </button>
+  </div>
+
+  @if (cargando() && negocios().length === 0) {
+    <div class="negocios__estado">
+      <p class="et-muted">Cargando negocios…</p>
+    </div>
+  } @else if (empresas().length === 0) {
+    <et-empty-state
+      icon="building"
+      title="Primero creá una empresa"
+      description="Los negocios pertenecen a una empresa. Creá una empresa y después volvé para dar de alta sus negocios."
+    />
+    <div class="negocios__estado">
+      <a class="et-btn et-btn--primary" routerLink="/empresas">
+        <et-icon name="building" [size]="16" />
+        Ir a Empresas
+      </a>
+    </div>
+  } @else if (!empresaSeleccionada()) {
+    <et-empty-state
+      icon="building"
+      title="Elegí una empresa"
+      description="Seleccioná una empresa arriba para ver y gestionar únicamente sus negocios."
+    />
+  } @else if (negociosDeEmpresa().length === 0) {
+    <et-empty-state
+      icon="layers"
+      title="Esta empresa todavía no tiene negocios"
+      description="Creá el primer negocio de {{
+        empresaSeleccionadaNombre()
+      }} con su conexión a base de datos y backend."
+    />
+    <div class="negocios__estado">
+      <button class="et-btn et-btn--primary" type="button" (click)="abrirAlta()">
+        <et-icon name="plus" [size]="16" />
+        Nuevo negocio
+      </button>
+    </div>
+  } @else if (negociosFiltrados().length === 0) {
+    <et-empty-state
+      icon="search"
+      title="Sin resultados"
+      description="Ningún negocio de {{ empresaSeleccionadaNombre() }} coincide con la búsqueda."
+    />
+  } @else {
+    <div class="et-table-wrap">
+      <table class="et-table">
+        <thead>
+          <tr>
+            <th>Negocio</th>
+            <th>TenantID</th>
+            <th>Base de datos</th>
+            <th>Backend</th>
+            <th><span class="et-sr-only">Acciones</span></th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (negocio of negociosFiltrados(); track negocio.negocioId) {
+            <tr>
+              <td>
+                <div class="negocios__identidad">
+                  <strong>{{ negocio.nombre }}</strong>
+                  <span class="et-muted">#{{ negocio.negocioId }}</span>
+                </div>
+              </td>
+              <td>
+                <div class="negocios__tenant">
+                  <code class="et-mono" [title]="negocio.tenantId">{{ negocio.tenantId }}</code>
+                  <button
+                    class="et-btn et-btn--icon et-btn--sm"
+                    type="button"
+                    [title]="copiado() === negocio.negocioId ? 'Copiado' : 'Copiar TenantID'"
+                    (click)="copiarTenant(negocio)"
+                  >
+                    <et-icon
+                      [name]="copiado() === negocio.negocioId ? 'check' : 'copy'"
+                      [size]="14"
+                    />
+                  </button>
+                </div>
+              </td>
+              <td>
+                <div class="negocios__conexion">
+                  <span>{{ negocio.databaseName || '—' }}</span>
+                  <span class="et-muted et-mono">{{ conexion(negocio) }}</span>
+                </div>
+              </td>
+              <td class="et-mono et-muted">{{ backend(negocio) }}</td>
+              <td class="negocios__acciones">
+                <button class="et-btn et-btn--sm" type="button" (click)="abrirEdicion(negocio)">
+                  <et-icon name="settings" [size]="16" />
+                  Editar
+                </button>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</div>
+
+@if (dialogo(); as d) {
+  <div class="negocios__overlay">
+    <form
+      class="negocios__dialog"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="negocio-dialogo-titulo"
+      (ngSubmit)="guardar()"
+    >
+      <header class="negocios__dialog-header">
+        <h2 id="negocio-dialogo-titulo">
+          {{ d.modo === 'crear' ? 'Nuevo negocio' : 'Editar negocio' }}
+        </h2>
+        <p class="et-muted">
+          {{
+            d.modo === 'crear'
+              ? 'El TenantID se genera automáticamente a partir de la empresa.'
+              : 'El TenantID no se modifica. La contraseña se conserva si la dejás vacía.'
+          }}
+        </p>
+      </header>
+
+      @if (errorDialogo(); as mensaje) {
+        <p class="et-error" role="alert">{{ mensaje }}</p>
+      }
+
+      <div class="negocios__grid">
+        <h3 class="negocios__seccion">Datos del negocio</h3>
+
+        <div class="et-field">
+          <span class="et-label">Empresa</span>
+          <div class="negocios__empresa-fija">
+            <et-icon name="building" [size]="16" />
+            <strong>{{ empresaNombre(formulario.empresaId) }}</strong>
+          </div>
+          <span class="et-hint">
+            {{
+              d.modo === 'crear'
+                ? 'El negocio se crea dentro de la empresa seleccionada.'
+                : 'El negocio pertenece a esta empresa; no se puede mover desde acá.'
+            }}
+          </span>
+        </div>
+
+        <label class="et-field">
+          <span class="et-label">
+            Nombre
+            <span class="negocios__requerido" aria-hidden="true">*</span>
+          </span>
+          <input
+            class="et-input"
+            name="nombre"
+            type="text"
+            maxlength="200"
+            required
+            autocomplete="off"
+            placeholder="Nombre del negocio"
+            [(ngModel)]="formulario.nombre"
+          />
+        </label>
+
+        <div class="et-field negocios__ancho">
+          <span class="et-label">TenantID</span>
+          <div class="negocios__tenant-preview">
+            <code class="et-mono">{{ tenantIdVistaPrevia() }}</code>
+            @if (d.modo === 'crear') {
+              <button class="et-btn et-btn--sm" type="button" (click)="regenerarTenantId()">
+                <et-icon name="swap" [size]="14" />
+                Regenerar
+              </button>
+            }
+          </div>
+          <span class="et-hint">
+            {{
+              d.modo === 'crear'
+                ? 'Formato PREFIJO_tenant_AAAAMMDD_sufijo. Se usa en el header X-Tenant-Id.'
+                : 'Identificador del tenant. No se regenera al editar.'
+            }}
+          </span>
+        </div>
+
+        <h3 class="negocios__seccion">Conexión a la base de datos</h3>
+
+        <label class="et-field">
+          <span class="et-label">Nombre de la base</span>
+          <input
+            class="et-input"
+            name="databaseName"
+            type="text"
+            maxlength="100"
+            autocomplete="off"
+            placeholder="eterea_negocio"
+            [(ngModel)]="formulario.databaseName"
+          />
+        </label>
+
+        <label class="et-field">
+          <span class="et-label">IP / Host</span>
+          <input
+            class="et-input"
+            name="databaseIp"
+            type="text"
+            maxlength="50"
+            autocomplete="off"
+            placeholder="10.0.0.10"
+            [(ngModel)]="formulario.databaseIp"
+          />
+        </label>
+
+        <label class="et-field">
+          <span class="et-label">Puerto</span>
+          <input
+            class="et-input"
+            name="databasePort"
+            type="text"
+            inputmode="numeric"
+            maxlength="5"
+            autocomplete="off"
+            placeholder="3306"
+            [(ngModel)]="formulario.databasePort"
+          />
+        </label>
+
+        <label class="et-field">
+          <span class="et-label">Usuario</span>
+          <input
+            class="et-input"
+            name="databaseUsername"
+            type="text"
+            maxlength="50"
+            autocomplete="off"
+            [(ngModel)]="formulario.databaseUsername"
+          />
+        </label>
+
+        <label class="et-field negocios__ancho">
+          <span class="et-label">Contraseña</span>
+          <input
+            class="et-input"
+            name="databasePassword"
+            type="password"
+            maxlength="200"
+            autocomplete="new-password"
+            [placeholder]="d.modo === 'editar' ? 'Sin cambios' : 'Opcional'"
+            [(ngModel)]="formulario.databasePassword"
+          />
+          <span class="et-hint">
+            {{
+              d.modo === 'editar'
+                ? 'Dejá vacío para conservar la contraseña actual.'
+                : 'Se guarda sólo en el backend; no se vuelve a mostrar.'
+            }}
+          </span>
+        </label>
+
+        <h3 class="negocios__seccion">Backend</h3>
+
+        <label class="et-field">
+          <span class="et-label">IP / Host</span>
+          <input
+            class="et-input"
+            name="backendIp"
+            type="text"
+            maxlength="50"
+            autocomplete="off"
+            [(ngModel)]="formulario.backendIp"
+          />
+        </label>
+
+        <label class="et-field">
+          <span class="et-label">Puerto</span>
+          <input
+            class="et-input"
+            name="backendPort"
+            type="text"
+            inputmode="numeric"
+            maxlength="5"
+            autocomplete="off"
+            [(ngModel)]="formulario.backendPort"
+          />
+        </label>
+      </div>
+
+      <div class="negocios__dialog-acciones">
+        <button class="et-btn" type="button" (click)="cerrar()" [disabled]="guardando()">
+          Cancelar
+        </button>
+        <button class="et-btn et-btn--primary" type="submit" [disabled]="guardando()">
+          {{
+            guardando() ? 'Guardando…' : d.modo === 'crear' ? 'Crear negocio' : 'Guardar cambios'
+          }}
+        </button>
+      </div>
+    </form>
+  </div>
+}

@@ -1,0 +1,273 @@
+<et-page-header
+  eyebrow="Maestros"
+  title="Ejercicios"
+  description="Ejercicios económicos del negocio activo, con sus fechas y estado de bloqueo."
+>
+  <button class="et-btn et-btn--ghost" type="button" (click)="cargar()" [disabled]="cargando()">
+    <et-icon name="swap" [size]="16" />
+    {{ cargando() ? 'Actualizando…' : 'Actualizar' }}
+  </button>
+  <button
+    class="et-btn et-btn--primary"
+    type="button"
+    (click)="crearSiguiente()"
+    [disabled]="creando() || guardando()"
+  >
+    <et-icon name="plus" [size]="16" />
+    {{ creando() ? 'Creando…' : 'Nuevo ejercicio' }}
+  </button>
+</et-page-header>
+
+@if (error(); as mensaje) {
+  <div class="ejercicios__alerta" role="alert">
+    <div>
+      <p class="et-error">{{ mensaje }}</p>
+      @if (sinPermiso()) {
+        <p class="et-muted">
+          Tu usuario no tiene asignado este negocio o le falta el permiso necesario.
+        </p>
+      }
+    </div>
+    <button class="et-btn et-btn--sm" type="button" (click)="cargar()">Reintentar</button>
+  </div>
+}
+
+@if (aviso(); as mensaje) {
+  <div class="ejercicios__aviso" role="status">
+    <p>{{ mensaje }}</p>
+    <button
+      class="et-btn et-btn--icon et-btn--sm"
+      type="button"
+      aria-label="Cerrar aviso"
+      (click)="cerrarAviso()"
+    >
+      <et-icon name="close" [size]="16" />
+    </button>
+  </div>
+}
+
+<div class="et-card">
+  <div class="ejercicios__barra">
+    <p class="et-muted">
+      {{ total() }} {{ total() === 1 ? 'ejercicio' : 'ejercicios' }} · {{ bloqueados() }}
+      {{ bloqueados() === 1 ? 'bloqueado' : 'bloqueados' }}
+    </p>
+  </div>
+
+  @if (cargando() && ejercicios().length === 0) {
+    <div class="ejercicios__estado">
+      <p class="et-muted">Cargando ejercicios…</p>
+    </div>
+  } @else if (sinPermiso()) {
+    <et-empty-state
+      icon="lock"
+      title="Sin permiso"
+      description="No podés ver los ejercicios de este negocio con tu usuario actual."
+    />
+  } @else if (ejercicios().length === 0) {
+    <et-empty-state
+      icon="calendar"
+      title="Todavía no hay ejercicios"
+      description="Creá el primer ejercicio del negocio; el servidor calcula automáticamente el nombre y las fechas."
+    >
+      <button
+        class="et-btn et-btn--primary"
+        type="button"
+        (click)="crearSiguiente()"
+        [disabled]="creando()"
+      >
+        <et-icon name="plus" [size]="16" />
+        {{ creando() ? 'Creando…' : 'Nuevo ejercicio' }}
+      </button>
+    </et-empty-state>
+  } @else {
+    <div class="et-table-wrap">
+      <table class="et-table">
+        <thead>
+          <tr>
+            <th>Ejercicio</th>
+            <th>Desde</th>
+            <th>Hasta</th>
+            <th>Estado</th>
+            <th>Bloqueo</th>
+            <th><span class="et-sr-only">Acciones</span></th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (ejercicio of ejercicios(); track ejercicio.ejercicioId) {
+            <tr>
+              <td>
+                <strong>{{ ejercicio.nombre }}</strong>
+              </td>
+              <td>{{ fechaVisible(ejercicio.fechaInicio) }}</td>
+              <td>{{ fechaVisible(ejercicio.fechaFin) }}</td>
+              <td>
+                <span
+                  class="et-badge"
+                  [class.et-badge--success]="ejercicio.estado === 'EN_CURSO'"
+                  [class.et-badge--outline]="ejercicio.estado === 'FUTURO'"
+                  [class.et-badge--warn]="ejercicio.estado === 'FINALIZADO'"
+                >
+                  {{ estadoEtiqueta(ejercicio.estado) }}
+                </span>
+              </td>
+              <td>
+                <span
+                  class="et-badge"
+                  [class.et-badge--danger]="ejercicio.bloqueado"
+                  [class.et-badge--outline]="!ejercicio.bloqueado"
+                >
+                  {{ ejercicio.bloqueado ? 'Bloqueado' : 'Abierto' }}
+                </span>
+              </td>
+              <td class="ejercicios__acciones">
+                <button class="et-btn et-btn--sm" type="button" (click)="abrirEdicion(ejercicio)">
+                  <et-icon name="settings" [size]="16" />
+                  Editar
+                </button>
+                @if (esAdministrador()) {
+                  <button
+                    class="et-btn et-btn--sm"
+                    type="button"
+                    (click)="solicitarBloqueo(ejercicio)"
+                  >
+                    <et-icon [name]="ejercicio.bloqueado ? 'lock' : 'check'" [size]="16" />
+                    {{ ejercicio.bloqueado ? 'Desbloquear' : 'Bloquear' }}
+                  </button>
+                  <button
+                    class="et-btn et-btn--sm et-btn--danger"
+                    type="button"
+                    (click)="solicitarEliminacion(ejercicio)"
+                  >
+                    <et-icon name="close" [size]="16" />
+                    Eliminar
+                  </button>
+                }
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</div>
+
+@if (formularioAbierto()) {
+  <div class="ejercicios__overlay">
+    <form
+      class="ejercicios__dialog"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="ejercicio-dialogo-titulo"
+      (ngSubmit)="guardar()"
+    >
+      <header class="ejercicios__dialog-header">
+        <h2 id="ejercicio-dialogo-titulo">
+          {{ modo() === 'crear' ? 'Nuevo ejercicio' : 'Editar ejercicio' }}
+        </h2>
+        <p class="et-muted">
+          {{
+            modo() === 'crear'
+              ? 'El servidor valida el solapamiento con los ejercicios existentes.'
+              : 'El identificador no se modifica. Si el ejercicio tiene movimientos, las fechas quedan bloqueadas.'
+          }}
+        </p>
+      </header>
+
+      @if (errorFormulario(); as mensaje) {
+        <p class="et-error" role="alert">{{ mensaje }}</p>
+      }
+
+      <label class="et-field">
+        <span class="et-label">Nombre</span>
+        <input
+          class="et-input"
+          name="nombre"
+          type="text"
+          maxlength="128"
+          required
+          autocomplete="off"
+          placeholder="Ejercicio Económico 2027"
+          [(ngModel)]="formulario.nombre"
+        />
+      </label>
+
+      <div class="ejercicios__fechas">
+        <label class="et-field">
+          <span class="et-label">Desde</span>
+          <input
+            class="et-input"
+            name="fechaInicio"
+            type="date"
+            required
+            [(ngModel)]="formulario.fechaInicio"
+          />
+        </label>
+        <label class="et-field">
+          <span class="et-label">Hasta</span>
+          <input
+            class="et-input"
+            name="fechaFin"
+            type="date"
+            required
+            [(ngModel)]="formulario.fechaFin"
+          />
+        </label>
+      </div>
+
+      <div class="ejercicios__dialog-acciones">
+        <button
+          class="et-btn et-btn--ghost"
+          type="button"
+          (click)="cancelarFormulario()"
+          [disabled]="guardando()"
+        >
+          Cancelar
+        </button>
+        <button class="et-btn et-btn--primary" type="submit" [disabled]="guardando()">
+          {{ guardando() ? 'Guardando…' : 'Guardar' }}
+        </button>
+      </div>
+    </form>
+  </div>
+}
+
+@if (confirmacion(); as c) {
+  <div class="ejercicios__overlay">
+    <div
+      class="ejercicios__dialog"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="ejercicio-confirmacion-titulo"
+    >
+      <header class="ejercicios__dialog-header">
+        <h2 id="ejercicio-confirmacion-titulo">{{ tituloConfirmacion(c) }}</h2>
+        <p class="et-muted">{{ textoConfirmacion(c) }}</p>
+      </header>
+
+      @if (errorAccion(); as mensaje) {
+        <p class="et-error" role="alert">{{ mensaje }}</p>
+      }
+
+      <div class="ejercicios__dialog-acciones">
+        <button
+          class="et-btn et-btn--ghost"
+          type="button"
+          (click)="cancelarConfirmacion()"
+          [disabled]="ejecutandoAccion()"
+        >
+          Cancelar
+        </button>
+        <button
+          class="et-btn"
+          [class.et-btn--danger]="c.tipo === 'eliminar'"
+          type="button"
+          (click)="confirmarAccion()"
+          [disabled]="ejecutandoAccion()"
+        >
+          {{ ejecutandoAccion() ? 'Procesando…' : etiquetaConfirmacion(c) }}
+        </button>
+      </div>
+    </div>
+  </div>
+}

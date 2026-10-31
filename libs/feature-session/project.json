@@ -1,0 +1,13 @@
+{
+  "name": "feature-session",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/feature-session/src",
+  "prefix": "et",
+  "projectType": "library",
+  "tags": ["type:feature", "scope:shared"],
+  "targets": {
+    "lint": {
+      "executor": "@nx/eslint:lint"
+    }
+  }
+}

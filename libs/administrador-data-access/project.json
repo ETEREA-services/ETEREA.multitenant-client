@@ -1,0 +1,13 @@
+{
+  "name": "administrador-data-access",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/administrador-data-access/src",
+  "prefix": "et",
+  "projectType": "library",
+  "tags": ["type:data-access", "scope:administrador"],
+  "targets": {
+    "lint": {
+      "executor": "@nx/eslint:lint"
+    }
+  }
+}

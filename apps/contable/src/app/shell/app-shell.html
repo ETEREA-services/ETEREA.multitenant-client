@@ -1,0 +1,25 @@
+<et-shell
+  [navGroups]="navGroups"
+  [empresaName]="empresaName()"
+  [negocioName]="negocioName()"
+  [tenantInitials]="tenantInitials()"
+  [userName]="userName()"
+  [userRole]="userRole()"
+  [userInitials]="userInitials()"
+  [envLabel]="envLabel()"
+  (openContext)="abrirSelector()"
+  (changePassword)="irACambiarPassword()"
+  (logout)="salir()"
+>
+  <router-outlet />
+</et-shell>
+
+@if (selectorAbierto()) {
+  <et-contexto-dialog
+    [empresas]="empresas()"
+    [empresaActivaId]="empresaActivaId()"
+    [negocioActivoId]="negocioActivoId()"
+    (seleccionar)="aplicarContexto($event)"
+    (cerrar)="cerrarSelector()"
+  />
+}

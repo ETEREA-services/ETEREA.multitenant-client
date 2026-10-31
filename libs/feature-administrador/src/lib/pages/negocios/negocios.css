@@ -1,0 +1,249 @@
+:host {
+  display: block;
+}
+
+.negocios__error {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1rem 1.25rem;
+  margin-bottom: 1rem;
+}
+
+.negocios__error p {
+  margin: 0;
+}
+
+.negocios__barra {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid var(--et-line);
+}
+
+.negocios__filtros {
+  display: flex;
+  align-items: flex-end;
+  gap: 0.75rem;
+  flex: 1;
+  min-width: 0;
+}
+
+.negocios__buscador {
+  width: min(20rem, 100%);
+}
+
+.negocios__empresa-filtro {
+  width: min(16rem, 100%);
+}
+
+.negocios__estado {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1.25rem;
+}
+
+.negocios__estado p {
+  margin: 0;
+}
+
+.negocios__identidad {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  min-width: 0;
+}
+
+.negocios__identidad .et-muted {
+  font-size: 0.72rem;
+}
+
+.negocios__tenant {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  min-width: 0;
+}
+
+.negocios__tenant code {
+  max-width: 20rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 0.72rem;
+}
+
+.negocios__conexion {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+}
+
+.negocios__conexion .et-muted {
+  font-size: 0.72rem;
+}
+
+.negocios__empresa-fija {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-height: 40px;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--et-line);
+  border-radius: var(--et-radius-sm);
+  background: var(--et-surface-2);
+  color: var(--et-text-soft);
+}
+
+.negocios__acciones {
+  text-align: right;
+  white-space: nowrap;
+}
+
+.negocios__acciones .et-btn {
+  gap: 0.35rem;
+}
+
+.negocios__overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.25rem;
+  background: rgb(0 0 0 / 45%);
+}
+
+.negocios__dialog {
+  width: min(46rem, 100%);
+  max-height: calc(100vh - 2.5rem);
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 1.4rem;
+  border: 1px solid var(--et-line);
+  border-radius: var(--et-radius-lg);
+  background: var(--et-surface);
+  box-shadow: var(--et-shadow-lg);
+}
+
+.negocios__dialog-header {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+}
+
+.negocios__dialog-header h2 {
+  margin: 0;
+  font-size: 1.15rem;
+}
+
+.negocios__dialog-header p {
+  margin: 0;
+  font-size: 0.8rem;
+  line-height: 1.5;
+}
+
+.negocios__grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.9rem;
+}
+
+.negocios__seccion {
+  grid-column: 1 / -1;
+  margin: 0.35rem 0 0;
+  padding-top: 0.6rem;
+  border-top: 1px solid var(--et-line);
+  color: var(--et-text-soft);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.negocios__seccion:first-child {
+  margin-top: 0;
+  padding-top: 0;
+  border-top: 0;
+}
+
+.negocios__ancho {
+  grid-column: 1 / -1;
+}
+
+.negocios__requerido {
+  color: var(--et-danger);
+}
+
+.negocios__tenant-preview {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.6rem 0.75rem;
+  border: 1px dashed var(--et-line-strong);
+  border-radius: var(--et-radius-sm);
+  background: var(--et-surface-2);
+}
+
+.negocios__tenant-preview code {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 0.78rem;
+}
+
+.negocios__dialog-acciones {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+}
+
+@media (max-width: 760px) {
+  .negocios__barra {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .negocios__filtros {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .negocios__buscador,
+  .negocios__empresa-filtro {
+    width: 100%;
+  }
+}
+
+@media (max-width: 620px) {
+  .negocios__grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .negocios__ancho {
+    grid-column: auto;
+  }
+
+  .negocios__dialog-acciones {
+    flex-direction: column-reverse;
+  }
+
+  .negocios__dialog-acciones .et-btn {
+    width: 100%;
+  }
+
+  .negocios__tenant-preview {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}

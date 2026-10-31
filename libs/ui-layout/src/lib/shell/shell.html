@@ -1,0 +1,159 @@
+@if (menuAbierto()) {
+  <button
+    type="button"
+    class="et-scrim"
+    aria-label="Cerrar navegación"
+    (click)="cerrarMenu()"
+  ></button>
+}
+
+<aside class="et-nav" [class.is-open]="menuAbierto()">
+  <a class="et-brand" routerLink="/" (click)="cerrarMenu()">
+    <span class="et-brand__mark" aria-hidden="true">
+      <svg viewBox="0 0 24 24" fill="none">
+        <path
+          d="M5 6.5h14M5 12h9M5 17.5h14"
+          stroke="currentColor"
+          stroke-width="2.4"
+          stroke-linecap="round"
+        />
+        <circle cx="18.6" cy="12" r="1.9" fill="currentColor" />
+      </svg>
+    </span>
+    <span class="et-brand__word">
+      <strong>eterea</strong>
+      <small>{{ appName() }}</small>
+    </span>
+  </a>
+
+  <div class="et-nav__scroll">
+    <nav aria-label="Navegación principal">
+      @for (group of navGroups(); track group.label) {
+        <div class="et-nav__group">
+          <p class="et-nav__label">{{ group.label }}</p>
+          @for (item of group.items; track item.path) {
+            <a
+              class="et-nav__link"
+              [routerLink]="item.path"
+              routerLinkActive="is-active"
+              ariaCurrentWhenActive="page"
+              [routerLinkActiveOptions]="{ exact: item.exact ?? false }"
+              (click)="cerrarMenu()"
+            >
+              <et-icon [name]="item.icon" [size]="18" />
+              <span>{{ item.label }}</span>
+            </a>
+          }
+        </div>
+      }
+    </nav>
+  </div>
+
+  <div class="et-nav__footer">
+    @if (showTenant()) {
+      <button
+        type="button"
+        class="et-tenant"
+        [attr.aria-label]="
+          'Cambiar contexto. Empresa ' + empresaName() + ', negocio ' + negocioName()
+        "
+        (click)="openContext.emit()"
+      >
+        <span class="et-tenant__avatar" [style.background]="tenantColor() ?? null">
+          {{ tenantInitials() }}
+        </span>
+        <span class="et-tenant__text">
+          <strong [title]="negocioName()">{{ negocioName() }}</strong>
+          <small [title]="empresaName()">{{ empresaName() }}</small>
+        </span>
+        <et-icon name="swap" [size]="16" />
+      </button>
+    }
+
+    <div class="et-user">
+      <button
+        type="button"
+        class="et-user__trigger"
+        [attr.aria-expanded]="menuUsuarioAbierto()"
+        aria-haspopup="menu"
+        aria-label="Abrir menú de usuario"
+        (click)="alternarMenuUsuario()"
+      >
+        <span class="et-user__avatar">{{ userInitials() }}</span>
+        <span class="et-user__text">
+          <strong>{{ userName() }}</strong>
+          <small>{{ userRole() }}</small>
+        </span>
+        <et-icon name="chevron-down" [size]="15" />
+      </button>
+
+      @if (menuUsuarioAbierto()) {
+        <div class="et-user__menu" role="menu">
+          <button
+            type="button"
+            class="et-user__item"
+            role="menuitem"
+            (click)="changePassword.emit(); cerrarMenuUsuario()"
+          >
+            <et-icon name="lock" [size]="16" />
+            <span>Cambiar contraseña</span>
+          </button>
+          <button
+            type="button"
+            class="et-user__item et-user__item--danger"
+            role="menuitem"
+            (click)="logout.emit(); cerrarMenuUsuario()"
+          >
+            <et-icon name="logout" [size]="16" />
+            <span>Cerrar sesión</span>
+          </button>
+        </div>
+      }
+    </div>
+  </div>
+</aside>
+
+<div class="et-shell__main">
+  <header class="et-topbar">
+    <div class="et-topbar__left">
+      <button
+        type="button"
+        class="et-topbar__menu"
+        [attr.aria-expanded]="menuAbierto()"
+        aria-label="Abrir navegación"
+        (click)="alternarMenu()"
+      >
+        <et-icon [name]="menuAbierto() ? 'close' : 'menu'" [size]="20" />
+      </button>
+
+      @if (showTenant()) {
+        <et-shell-context
+          [empresaName]="empresaName()"
+          [negocioName]="negocioName()"
+          (open)="openContext.emit()"
+        />
+      }
+    </div>
+
+    <div class="et-topbar__right">
+      <span class="et-badge et-badge--outline">{{ envLabel() }}</span>
+
+      <button
+        type="button"
+        class="et-topbar__theme"
+        [attr.aria-label]="theme.esOscuro() ? 'Activar tema claro' : 'Activar tema oscuro'"
+        (click)="theme.alternar()"
+      >
+        <et-icon [name]="theme.esOscuro() ? 'sun' : 'moon'" [size]="18" />
+      </button>
+
+      <span class="et-topbar__user" [title]="userName()">{{ userInitials() }}</span>
+    </div>
+  </header>
+
+  <main class="et-main">
+    <div class="et-main__inner et-enter">
+      <ng-content />
+    </div>
+  </main>
+</div>

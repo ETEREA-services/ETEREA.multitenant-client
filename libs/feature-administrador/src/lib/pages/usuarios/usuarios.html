@@ -1,0 +1,268 @@
+<et-page-header
+  eyebrow="Accesos"
+  title="Usuarios"
+  description="Usuarios de la plataforma, sus datos de acceso y su estado."
+>
+  <button class="et-btn et-btn--primary" type="button" (click)="abrirAlta()">
+    <et-icon name="plus" [size]="16" />
+    Nuevo usuario
+  </button>
+  <button class="et-btn et-btn--ghost" type="button" (click)="cargar()" [disabled]="cargando()">
+    <et-icon name="swap" [size]="16" />
+    {{ cargando() ? 'Actualizando…' : 'Actualizar' }}
+  </button>
+</et-page-header>
+
+<div class="et-card">
+  @if (error(); as mensaje) {
+    <div class="usuarios__estado" role="alert">
+      <p class="et-error">{{ mensaje }}</p>
+      <button class="et-btn et-btn--sm" type="button" (click)="cargar()">Reintentar</button>
+    </div>
+  } @else if (cargando() && usuarios().length === 0) {
+    <div class="usuarios__estado">
+      <p class="et-muted">Cargando usuarios…</p>
+    </div>
+  } @else if (usuarios().length === 0) {
+    <et-empty-state
+      icon="user"
+      title="Todavía no hay usuarios"
+      description="Cuando se den de alta usuarios van a aparecer acá con su login, email y estado de acceso. Usá «Nuevo usuario» para crear el primero."
+    />
+  } @else {
+    <div class="usuarios__tabla-scroll">
+      <table class="et-table">
+        <thead>
+          <tr>
+            <th>Usuario</th>
+            <th>Email</th>
+            <th>Estado</th>
+            <th>Último ingreso</th>
+            <th><span class="et-sr-only">Acciones</span></th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (usuario of usuarios(); track usuario.usuarioId) {
+            <tr>
+              <td>
+                <div class="usuarios__identidad">
+                  <span class="usuarios__avatar" aria-hidden="true">{{ iniciales(usuario) }}</span>
+                  <div class="usuarios__datos">
+                    <strong>{{ usuario.nombre }}</strong>
+                    <span class="et-muted">{{ usuario.login }}</span>
+                  </div>
+                </div>
+              </td>
+              <td class="et-muted">{{ usuario.email || '—' }}</td>
+              <td>
+                <div class="usuarios__badges">
+                  <span class="et-badge" [class.et-badge--success]="usuario.activo">
+                    {{ usuario.activo ? 'Activo' : 'Inactivo' }}
+                  </span>
+                  @if (usuario.administrador) {
+                    <span class="et-badge et-badge--primary">Admin</span>
+                  }
+                  @if (usuario.mustChangePassword) {
+                    <span class="et-badge et-badge--warn">Cambio pendiente</span>
+                  }
+                </div>
+              </td>
+              <td class="et-muted">{{ fecha(usuario.lastLoginAt) }}</td>
+              <td class="usuarios__acciones">
+                <div class="usuarios__acciones-grupo">
+                  <button
+                    class="et-btn et-btn--sm"
+                    type="button"
+                    (click)="verAsignaciones(usuario)"
+                  >
+                    <et-icon name="swap" [size]="16" />
+                    Asignaciones
+                  </button>
+                  <button
+                    class="et-btn et-btn--sm"
+                    type="button"
+                    (click)="pedirConfirmacion(usuario)"
+                  >
+                    <et-icon name="lock" [size]="16" />
+                    Blanquear contraseña
+                  </button>
+                </div>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</div>
+
+@if (altaAbierta()) {
+  <div class="usuarios__overlay">
+    <form
+      class="usuarios__dialog usuarios__dialog--form"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="alta-usuario-titulo"
+      (ngSubmit)="crear()"
+    >
+      <header class="usuarios__dialog-header">
+        <h2 id="alta-usuario-titulo">Nuevo usuario</h2>
+        <p class="et-muted">
+          La contraseña es obligatoria en el alta. El usuario podrá cambiarla después desde su
+          cuenta.
+        </p>
+      </header>
+
+      @if (errorAlta(); as mensaje) {
+        <p class="et-error" role="alert">{{ mensaje }}</p>
+      }
+
+      <div class="usuarios__form-grid">
+        <label class="et-field">
+          <span class="et-label">Login</span>
+          <input
+            class="et-input"
+            name="login"
+            type="text"
+            maxlength="100"
+            required
+            autocomplete="username"
+            placeholder="usuario.apellido"
+            [(ngModel)]="formulario.login"
+          />
+        </label>
+
+        <label class="et-field">
+          <span class="et-label">Nombre y apellido</span>
+          <input
+            class="et-input"
+            name="nombre"
+            type="text"
+            maxlength="200"
+            required
+            autocomplete="name"
+            placeholder="Nombre completo"
+            [(ngModel)]="formulario.nombre"
+          />
+        </label>
+
+        <label class="et-field">
+          <span class="et-label">Email</span>
+          <input
+            class="et-input"
+            name="email"
+            type="email"
+            maxlength="200"
+            required
+            autocomplete="email"
+            placeholder="usuario@empresa.com"
+            [(ngModel)]="formulario.email"
+          />
+        </label>
+
+        <label class="et-field">
+          <span class="et-label">Contraseña inicial</span>
+          <input
+            class="et-input"
+            name="password"
+            type="password"
+            minlength="8"
+            maxlength="255"
+            required
+            autocomplete="new-password"
+            placeholder="Mínimo 8 caracteres"
+            [(ngModel)]="formulario.password"
+          />
+        </label>
+
+        <label class="et-field">
+          <span class="et-label">Estado</span>
+          <select class="et-select" name="activo" [(ngModel)]="formulario.activo">
+            <option [ngValue]="true">Activo</option>
+            <option [ngValue]="false">Inactivo</option>
+          </select>
+        </label>
+
+        <label class="et-field">
+          <span class="et-label">Rol</span>
+          <select class="et-select" name="administrador" [(ngModel)]="formulario.administrador">
+            <option [ngValue]="false">Usuario común</option>
+            <option [ngValue]="true">Administrador</option>
+          </select>
+        </label>
+      </div>
+
+      <div class="usuarios__dialog-acciones">
+        <button class="et-btn" type="button" (click)="cerrarAlta()" [disabled]="guardando()">
+          Cancelar
+        </button>
+        <button class="et-btn et-btn--primary" type="submit" [disabled]="guardando()">
+          {{ guardando() ? 'Creando…' : 'Crear usuario' }}
+        </button>
+      </div>
+    </form>
+  </div>
+}
+
+@if (seleccionado(); as usuario) {
+  <div class="usuarios__overlay">
+    <div class="usuarios__dialog" role="dialog" aria-modal="true" aria-labelledby="blanqueo-titulo">
+      @if (resultado(); as temporal) {
+        <header class="usuarios__dialog-header">
+          <h2 id="blanqueo-titulo">Contraseña temporal generada</h2>
+          <p class="et-muted">
+            Entregá esta clave a <strong>{{ usuario.nombre }}</strong
+            >. No se vuelve a mostrar.
+          </p>
+        </header>
+
+        <div class="usuarios__clave">
+          <code class="et-mono">{{ temporal.temporaryPassword }}</code>
+          <button class="et-btn et-btn--sm" type="button" (click)="copiar()">
+            <et-icon name="check" [size]="16" />
+            {{ copiado() ? 'Copiada' : 'Copiar' }}
+          </button>
+        </div>
+
+        <p class="usuarios__aviso">
+          <et-icon name="clock" [size]="16" />
+          <span>
+            Vence el {{ fecha(temporal.expiresAt) }}. El usuario deberá cambiarla la primera vez que
+            ingrese.
+          </span>
+        </p>
+
+        <div class="usuarios__dialog-acciones">
+          <button class="et-btn et-btn--primary" type="button" (click)="cerrar()">Listo</button>
+        </div>
+      } @else {
+        <header class="usuarios__dialog-header">
+          <h2 id="blanqueo-titulo">Blanquear contraseña</h2>
+          <p class="et-muted">
+            Se va a generar una contraseña temporal para
+            <strong>{{ usuario.nombre }}</strong> ({{ usuario.login }}), se van a cerrar sus
+            sesiones activas y deberá cambiarla en el próximo ingreso.
+          </p>
+        </header>
+
+        @if (errorDialogo(); as mensaje) {
+          <p class="et-error" role="alert">{{ mensaje }}</p>
+        }
+
+        <div class="usuarios__dialog-acciones">
+          <button class="et-btn" type="button" (click)="cerrar()" [disabled]="generando()">
+            Cancelar
+          </button>
+          <button
+            class="et-btn et-btn--primary"
+            type="button"
+            (click)="confirmar()"
+            [disabled]="generando()"
+          >
+            {{ generando() ? 'Generando…' : 'Blanquear contraseña' }}
+          </button>
+        </div>
+      }
+    </div>
+  </div>
+}

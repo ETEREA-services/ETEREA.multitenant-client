@@ -1,0 +1,27 @@
+{
+  "compileOnSave": false,
+  "compilerOptions": {
+    "experimentalDecorators": true,
+    "importHelpers": true,
+    "target": "ES2022",
+    "module": "preserve",
+    "skipLibCheck": true,
+    "baseUrl": ".",
+    "paths": {
+      "@eterea/shared-api": ["./libs/shared-api/src/index.ts"],
+      "@eterea/ui-layout": ["./libs/ui-layout/src/index.ts"],
+      "@eterea/ui-reportes": ["./libs/ui-reportes/src/index.ts"],
+      "@eterea/reporte-shared": ["./libs/reporte-shared/src/index.ts"],
+      "@eterea/feature-session": ["./libs/feature-session/src/index.ts"],
+      "@eterea/contable-data-access": ["./libs/contable-data-access/src/index.ts"],
+      "@eterea/feature-contable": ["./libs/feature-contable/src/index.ts"],
+      "@eterea/administrador-data-access": ["./libs/administrador-data-access/src/index.ts"],
+      "@eterea/feature-administrador": ["./libs/feature-administrador/src/index.ts"]
+    },
+    "strict": true,
+    "noUncheckedSideEffectImports": false,
+    "types": ["*"],
+    "esModuleInterop": false,
+    "ignoreDeprecations": "6.0"
+  }
+}

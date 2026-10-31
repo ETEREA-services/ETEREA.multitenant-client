@@ -1,0 +1,87 @@
+@if (empresas().length === 0) {
+  <et-empty-state
+    icon="building"
+    title="Todavía no hay empresas disponibles"
+    description="Cuando tu organización vincule una empresa y un negocio a tu usuario, van a aparecer acá para que puedas elegir con cuál operar."
+  >
+    @if (permitirSalir()) {
+      <button class="et-btn et-btn--primary" type="button" (click)="salir.emit()">
+        Cerrar sesión
+      </button>
+    }
+  </et-empty-state>
+} @else if (paso() === 'empresa') {
+  <div class="contexto-step">
+    <p class="contexto-step__hint">
+      <span>Paso 1 de 2</span>
+      <strong>Elegí la empresa</strong>
+    </p>
+
+    <div class="contexto-list">
+      @for (empresa of empresas(); track empresa.empresaId) {
+        <button
+          type="button"
+          class="contexto-option"
+          [class.is-active]="empresa.empresaId === empresaActivaId()"
+          [disabled]="empresa.negocios.length === 0"
+          (click)="elegirEmpresa(empresa)"
+        >
+          <span class="contexto-option__avatar">{{ iniciales(empresa.nombre) }}</span>
+          <span class="contexto-option__text">
+            <strong>{{ empresa.nombre }}</strong>
+            <small>{{ resumenNegocios(empresa.negocios.length) }}</small>
+          </span>
+          @if (empresa.negocios.length > 0) {
+            <et-icon name="chevron-right" [size]="16" />
+          }
+        </button>
+      }
+    </div>
+  </div>
+} @else {
+  <div class="contexto-step">
+    <div class="contexto-step__head">
+      <button type="button" class="contexto-back" (click)="volver()">
+        <et-icon name="chevron-left" [size]="14" />
+        <span>Empresas</span>
+      </button>
+      <p class="contexto-step__hint">
+        <span>Paso 2 de 2</span>
+        <strong>Elegí el negocio</strong>
+      </p>
+    </div>
+
+    <p class="contexto-step__empresa">
+      <et-icon name="building" [size]="15" />
+      <span>{{ empresaElegida()?.nombre }}</span>
+    </p>
+
+    @if (negocios().length === 0) {
+      <et-empty-state
+        icon="layers"
+        title="Esta empresa no tiene negocios activos"
+        description="Elegí otra empresa o pedí a un administrador que te asigne un negocio."
+      />
+    } @else {
+      <div class="contexto-list">
+        @for (negocio of negocios(); track negocio.negocioId) {
+          <button
+            type="button"
+            class="contexto-option"
+            [class.is-active]="esNegocioActivo(negocio)"
+            (click)="elegirNegocio(negocio)"
+          >
+            <span class="contexto-option__avatar contexto-option__avatar--negocio">
+              {{ iniciales(negocio.nombre) }}
+            </span>
+            <span class="contexto-option__text">
+              <strong>{{ negocio.nombre }}</strong>
+              <small class="et-mono">{{ negocio.tenantId }}</small>
+            </span>
+            <et-icon [name]="esNegocioActivo(negocio) ? 'check' : 'arrow-right'" [size]="16" />
+          </button>
+        }
+      </div>
+    }
+  </div>
+}

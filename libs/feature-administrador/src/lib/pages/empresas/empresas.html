@@ -1,0 +1,154 @@
+<et-page-header
+  eyebrow="Organización"
+  title="Empresas"
+  description="Empresas registradas en la plataforma y sus datos base."
+>
+  <button class="et-btn et-btn--primary" type="button" (click)="abrirAlta()">
+    <et-icon name="plus" [size]="16" />
+    Nueva empresa
+  </button>
+</et-page-header>
+
+@if (error(); as mensaje) {
+  <div class="empresas__error" role="alert">
+    <p class="et-error">{{ mensaje }}</p>
+    <button class="et-btn et-btn--sm" type="button" (click)="cargar()">Reintentar</button>
+  </div>
+}
+
+<div class="et-card">
+  <div class="empresas__barra">
+    <label class="et-field empresas__buscador">
+      <span class="et-label">Buscar</span>
+      <input
+        class="et-input"
+        type="search"
+        placeholder="Nombre o identificador"
+        [value]="filtro()"
+        (input)="actualizarFiltro($event)"
+      />
+    </label>
+    <button class="et-btn et-btn--ghost" type="button" (click)="cargar()" [disabled]="cargando()">
+      <et-icon name="swap" [size]="16" />
+      {{ cargando() ? 'Actualizando…' : 'Actualizar' }}
+    </button>
+  </div>
+
+  @if (cargando() && empresas().length === 0) {
+    <div class="empresas__estado">
+      <p class="et-muted">Cargando empresas…</p>
+    </div>
+  } @else if (empresas().length === 0) {
+    <et-empty-state
+      icon="building"
+      title="Todavía no hay empresas"
+      description="Cuando se den de alta empresas van a aparecer acá con su identificador y sus negocios."
+    />
+  } @else if (empresasFiltradas().length === 0) {
+    <et-empty-state
+      icon="search"
+      title="Sin resultados"
+      description="Ninguna empresa coincide con la búsqueda."
+    />
+  } @else {
+    <div class="et-table-wrap">
+      <table class="et-table">
+        <thead>
+          <tr>
+            <th>Empresa</th>
+            <th>Identificador</th>
+            <th>Negocios</th>
+            <th><span class="et-sr-only">Acciones</span></th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (empresa of empresasFiltradas(); track empresa.empresaId) {
+            <tr>
+              <td>
+                <div class="empresas__identidad">
+                  <span class="empresas__avatar" aria-hidden="true">
+                    {{ empresa.nombre.charAt(0).toUpperCase() }}
+                  </span>
+                  <strong>{{ empresa.nombre }}</strong>
+                </div>
+              </td>
+              <td>
+                <code class="et-mono et-muted" [title]="empresa.empresaId">
+                  {{ idCorto(empresa.empresaId) }}…
+                </code>
+              </td>
+              <td>
+                <span
+                  class="et-badge"
+                  [class.et-badge--outline]="negociosDe(empresa.empresaId) === 0"
+                >
+                  {{ negociosDe(empresa.empresaId) }}
+                </span>
+              </td>
+              <td class="empresas__acciones">
+                <button class="et-btn et-btn--sm" type="button" (click)="abrirEdicion(empresa)">
+                  <et-icon name="settings" [size]="16" />
+                  Editar
+                </button>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</div>
+
+@if (dialogo(); as d) {
+  <div class="empresas__overlay">
+    <form
+      class="empresas__dialog"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="empresa-dialogo-titulo"
+      (ngSubmit)="guardar()"
+    >
+      <header class="empresas__dialog-header">
+        <h2 id="empresa-dialogo-titulo">
+          {{ d.modo === 'crear' ? 'Nueva empresa' : 'Editar empresa' }}
+        </h2>
+        <p class="et-muted">
+          {{
+            d.modo === 'crear'
+              ? 'El identificador de la empresa lo genera el servidor.'
+              : 'Los negocios asociados no se modifican al cambiar el nombre.'
+          }}
+        </p>
+      </header>
+
+      @if (errorDialogo(); as mensaje) {
+        <p class="et-error" role="alert">{{ mensaje }}</p>
+      }
+
+      <label class="et-field">
+        <span class="et-label">Nombre</span>
+        <input
+          class="et-input"
+          name="nombre"
+          type="text"
+          maxlength="200"
+          required
+          autocomplete="off"
+          placeholder="Razón social o nombre de la empresa"
+          [(ngModel)]="formulario.nombre"
+        />
+      </label>
+
+      <div class="empresas__dialog-acciones">
+        <button class="et-btn" type="button" (click)="cerrar()" [disabled]="guardando()">
+          Cancelar
+        </button>
+        <button class="et-btn et-btn--primary" type="submit" [disabled]="guardando()">
+          {{
+            guardando() ? 'Guardando…' : d.modo === 'crear' ? 'Crear empresa' : 'Guardar cambios'
+          }}
+        </button>
+      </div>
+    </form>
+  </div>
+}

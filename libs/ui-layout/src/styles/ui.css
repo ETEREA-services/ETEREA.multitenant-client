@@ -1,0 +1,593 @@
+/* ============================================================
+   Eterea · Contable — Primitivas globales
+   ============================================================ */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  font-size: 16px;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: var(--et-bg);
+  color: var(--et-text);
+  font-family: var(--et-font-sans);
+  font-size: 0.9375rem;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    radial-gradient(60rem 40rem at 92% -12%, rgba(58, 54, 232, 0.09), transparent 62%),
+    radial-gradient(46rem 32rem at -8% 108%, rgba(205, 242, 90, 0.16), transparent 60%);
+}
+
+[data-theme='dark'] body::before {
+  background:
+    radial-gradient(60rem 40rem at 92% -12%, rgba(125, 121, 255, 0.14), transparent 62%),
+    radial-gradient(46rem 32rem at -8% 108%, rgba(205, 242, 90, 0.05), transparent 60%);
+}
+
+h1,
+h2,
+h3,
+h4,
+p {
+  margin: 0;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  font-family: var(--et-font-display);
+  font-weight: 600;
+  letter-spacing: -0.025em;
+  line-height: 1.15;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button {
+  font: inherit;
+  color: inherit;
+}
+
+img,
+svg {
+  display: block;
+}
+
+::selection {
+  background: var(--et-accent);
+  color: var(--et-accent-ink);
+}
+
+:focus-visible {
+  outline: 2px solid var(--et-primary);
+  outline-offset: 2px;
+}
+
+/* Scrollbars discretos */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--et-line-strong) transparent;
+}
+
+*::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+*::-webkit-scrollbar-thumb {
+  background: var(--et-line-strong);
+  border: 3px solid transparent;
+  background-clip: padding-box;
+  border-radius: var(--et-radius-pill);
+}
+
+/* ---------- Tipografía utilitaria ---------- */
+
+.et-mono {
+  font-family: var(--et-font-mono);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em;
+}
+
+.et-muted {
+  color: var(--et-text-mute);
+}
+
+.et-soft {
+  color: var(--et-text-soft);
+}
+
+.et-amount {
+  font-family: var(--et-font-mono);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.03em;
+  white-space: nowrap;
+}
+
+.et-pos {
+  color: var(--et-success);
+}
+
+.et-neg {
+  color: var(--et-danger);
+}
+
+.et-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--et-text-mute);
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.et-eyebrow::before {
+  content: '';
+  width: 18px;
+  height: 1px;
+  background: var(--et-line-strong);
+}
+
+/* ---------- Layout ---------- */
+
+.et-stack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--et-gap, 1rem);
+}
+
+.et-row {
+  display: flex;
+  align-items: center;
+  gap: var(--et-gap, 0.75rem);
+}
+
+.et-spacer {
+  flex: 1;
+}
+
+.et-truncate {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.et-sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ---------- Botones ---------- */
+
+.et-btn {
+  --et-btn-bg: var(--et-surface);
+  --et-btn-fg: var(--et-text);
+  --et-btn-line: var(--et-line);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  height: 40px;
+  padding: 0 1rem;
+  border: 1px solid var(--et-btn-line);
+  border-radius: var(--et-radius-sm);
+  background: var(--et-btn-bg);
+  color: var(--et-btn-fg);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  letter-spacing: -0.005em;
+  white-space: nowrap;
+  cursor: pointer;
+  transition:
+    background var(--et-fast) var(--et-ease),
+    border-color var(--et-fast) var(--et-ease),
+    color var(--et-fast) var(--et-ease),
+    transform var(--et-fast) var(--et-ease),
+    box-shadow var(--et-fast) var(--et-ease);
+}
+
+.et-btn:hover:not(:disabled) {
+  border-color: var(--et-line-strong);
+  background: var(--et-surface-2);
+}
+
+.et-btn:active:not(:disabled) {
+  transform: translateY(1px);
+}
+
+.et-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.et-btn--primary {
+  --et-btn-bg: var(--et-primary);
+  --et-btn-fg: var(--et-primary-ink);
+  --et-btn-line: var(--et-primary);
+  box-shadow: 0 10px 22px -14px rgba(58, 54, 232, 0.9);
+}
+
+.et-btn--primary:hover:not(:disabled) {
+  --et-btn-bg: var(--et-primary-deep);
+  --et-btn-line: var(--et-primary-deep);
+}
+
+.et-btn--accent {
+  --et-btn-bg: var(--et-accent);
+  --et-btn-fg: var(--et-accent-ink);
+  --et-btn-line: var(--et-accent);
+}
+
+.et-btn--accent:hover:not(:disabled) {
+  --et-btn-bg: var(--et-accent-strong);
+  --et-btn-line: var(--et-accent-strong);
+}
+
+.et-btn--ghost {
+  --et-btn-bg: transparent;
+  --et-btn-line: transparent;
+  --et-btn-fg: var(--et-text-soft);
+}
+
+.et-btn--ghost:hover:not(:disabled) {
+  --et-btn-bg: var(--et-surface-3);
+  --et-btn-line: transparent;
+  color: var(--et-text);
+}
+
+.et-btn--danger {
+  --et-btn-bg: transparent;
+  --et-btn-fg: var(--et-danger);
+  --et-btn-line: var(--et-line);
+}
+
+.et-btn--danger:hover:not(:disabled) {
+  --et-btn-bg: var(--et-danger-soft);
+  --et-btn-line: var(--et-danger);
+}
+
+.et-btn--sm {
+  height: 32px;
+  padding: 0 0.75rem;
+  font-size: 0.75rem;
+  border-radius: var(--et-radius-xs);
+}
+
+.et-btn--lg {
+  height: 46px;
+  padding: 0 1.25rem;
+  border-radius: var(--et-radius-sm);
+}
+
+.et-btn--icon {
+  width: 40px;
+  padding: 0;
+}
+
+.et-btn--icon.et-btn--sm {
+  width: 32px;
+}
+
+.et-btn--block {
+  width: 100%;
+}
+
+/* ---------- Tarjetas ---------- */
+
+.et-card {
+  background: var(--et-surface);
+  border: 1px solid var(--et-line);
+  border-radius: var(--et-radius);
+  box-shadow: var(--et-shadow-xs);
+}
+
+.et-card--raised {
+  box-shadow: var(--et-shadow-sm);
+}
+
+.et-card__head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1.25rem 1.5rem 0;
+}
+
+.et-card__title {
+  font-family: var(--et-font-display);
+  font-size: 1rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+.et-card__subtitle {
+  margin-top: 0.2rem;
+  color: var(--et-text-mute);
+  font-size: 0.8125rem;
+}
+
+.et-card__body {
+  padding: 1.25rem 1.5rem 1.5rem;
+}
+
+.et-card__footer {
+  padding: 0.875rem 1.5rem;
+  border-top: 1px solid var(--et-line-soft);
+  background: var(--et-surface-2);
+  border-radius: 0 0 var(--et-radius) var(--et-radius);
+}
+
+/* ---------- Formularios ---------- */
+
+.et-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.et-label {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  color: var(--et-text-soft);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+}
+
+.et-input,
+.et-select,
+.et-textarea {
+  width: 100%;
+  min-height: 40px;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--et-line);
+  border-radius: var(--et-radius-sm);
+  background: var(--et-surface);
+  color: var(--et-text);
+  font-family: var(--et-font-sans);
+  font-size: 0.875rem;
+  transition:
+    border-color var(--et-fast) var(--et-ease),
+    box-shadow var(--et-fast) var(--et-ease);
+}
+
+.et-textarea {
+  min-height: 108px;
+  resize: vertical;
+}
+
+.et-input::placeholder,
+.et-textarea::placeholder {
+  color: var(--et-text-mute);
+}
+
+.et-input:hover,
+.et-select:hover,
+.et-textarea:hover {
+  border-color: var(--et-line-strong);
+}
+
+.et-input:focus,
+.et-select:focus,
+.et-textarea:focus {
+  outline: none;
+  border-color: var(--et-primary);
+  box-shadow: var(--et-ring);
+}
+
+.et-input:disabled,
+.et-select:disabled,
+.et-textarea:disabled {
+  background: var(--et-surface-3);
+  color: var(--et-text-mute);
+  cursor: not-allowed;
+}
+
+.et-hint {
+  color: var(--et-text-mute);
+  font-size: 0.75rem;
+}
+
+.et-error {
+  color: var(--et-danger);
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+/* ---------- Badges ---------- */
+
+.et-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  height: 24px;
+  padding: 0 0.6rem;
+  border: 1px solid transparent;
+  border-radius: var(--et-radius-pill);
+  background: var(--et-surface-3);
+  color: var(--et-text-soft);
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+}
+
+.et-badge--primary {
+  background: var(--et-primary-soft);
+  color: var(--et-primary);
+}
+
+.et-badge--accent {
+  background: var(--et-accent);
+  color: var(--et-accent-ink);
+}
+
+.et-badge--success {
+  background: var(--et-success-soft);
+  color: var(--et-success-ink);
+}
+
+.et-badge--warn {
+  background: var(--et-warn-soft);
+  color: var(--et-warn-ink);
+}
+
+.et-badge--danger {
+  background: var(--et-danger-soft);
+  color: var(--et-danger-ink);
+}
+
+.et-badge--outline {
+  background: transparent;
+  border-color: var(--et-line);
+  color: var(--et-text-soft);
+}
+
+.et-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+/* ---------- Tablas ---------- */
+
+.et-table-wrap {
+  width: 100%;
+  overflow-x: auto;
+  border-radius: var(--et-radius);
+}
+
+.et-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.8125rem;
+}
+
+.et-table th {
+  padding: 0.65rem 1rem;
+  border-bottom: 1px solid var(--et-line);
+  color: var(--et-text-mute);
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-align: left;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.et-table td {
+  padding: 0.8rem 1rem;
+  border-bottom: 1px solid var(--et-line-soft);
+  vertical-align: middle;
+}
+
+.et-table tbody tr {
+  transition: background var(--et-fast) var(--et-ease);
+}
+
+.et-table tbody tr:hover {
+  background: var(--et-surface-2);
+}
+
+.et-table tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.et-table .is-numeric {
+  text-align: right;
+}
+
+.et-table .is-tight {
+  width: 1%;
+  white-space: nowrap;
+}
+
+/* ---------- Separadores y utilidades ---------- */
+
+.et-divider {
+  height: 1px;
+  background: var(--et-line-soft);
+  border: 0;
+  margin: 0;
+}
+
+.et-kbd {
+  display: inline-flex;
+  align-items: center;
+  height: 20px;
+  padding: 0 0.35rem;
+  border: 1px solid var(--et-line);
+  border-bottom-width: 2px;
+  border-radius: 6px;
+  background: var(--et-surface-2);
+  color: var(--et-text-mute);
+  font-family: var(--et-font-mono);
+  font-size: 0.625rem;
+}
+
+/* ---------- Animaciones ---------- */
+
+@keyframes et-fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.et-enter {
+  animation: et-fade-up 420ms var(--et-ease) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+@media print {
+  body::before {
+    display: none;
+  }
+}

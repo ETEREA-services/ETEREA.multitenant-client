@@ -1,0 +1,8 @@
+@import 'tailwindcss';
+@import '../../../libs/ui-layout/src/styles/tokens.css';
+@import '../../../libs/ui-layout/src/styles/ui.css';
+
+html,
+body {
+  min-height: 100%;
+}
