@@ -1,0 +1,140 @@
+/* ============================================================
+   Eterea · Contable — Design tokens
+   Identidad: "tinta editorial + ultramar eléctrico + lima ácida"
+   ============================================================ */
+
+:root {
+  color-scheme: light;
+
+  /* Tipografía */
+  --et-font-sans: 'Inter', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --et-font-display: 'Sora', 'Inter', ui-sans-serif, system-ui, sans-serif;
+  --et-font-mono: 'JetBrains Mono', ui-monospace, 'SFMono-Regular', Menlo, monospace;
+
+  /* Superficies */
+  --et-bg: #f3f2ec;
+  --et-surface: #ffffff;
+  --et-surface-2: #faf9f4;
+  --et-surface-3: #efeee6;
+  --et-surface-inverse: #0a0d1b;
+
+  /* Líneas */
+  --et-line: #e3e1d6;
+  --et-line-soft: #ecebe3;
+  --et-line-strong: #cfccbe;
+
+  /* Texto */
+  --et-text: #12141f;
+  --et-text-soft: #5b5f70;
+  --et-text-mute: #8b8d99;
+  --et-text-inverse: #f4f5fa;
+
+  /* Marca */
+  --et-primary: #3a36e8;
+  --et-primary-deep: #2a26c9;
+  --et-primary-soft: #ecebff;
+  --et-primary-ink: #ffffff;
+  --et-accent: #cdf25a;
+  --et-accent-strong: #b7e02f;
+  --et-accent-ink: #1d2b00;
+
+  /* Semánticos */
+  --et-success: #0d9468;
+  --et-success-soft: #e3f6ee;
+  --et-success-ink: #075e43;
+  --et-warn: #b46f06;
+  --et-warn-soft: #fdf1dc;
+  --et-warn-ink: #7a4a02;
+  --et-danger: #cf3742;
+  --et-danger-soft: #fdecec;
+  --et-danger-ink: #8f1f27;
+  --et-info: #2568c9;
+  --et-info-soft: #e8f0fd;
+
+  /* Sidebar */
+  --et-sidebar: #090c18;
+  --et-sidebar-2: #101528;
+  --et-sidebar-text: #c9ccda;
+  --et-sidebar-muted: #7c8299;
+  --et-sidebar-line: rgba(255, 255, 255, 0.08);
+  --et-sidebar-active: rgba(255, 255, 255, 0.07);
+
+  /* Formas */
+  --et-radius-xs: 8px;
+  --et-radius-sm: 12px;
+  --et-radius: 18px;
+  --et-radius-lg: 24px;
+  --et-radius-xl: 32px;
+  --et-radius-pill: 999px;
+
+  /* Sombras */
+  --et-shadow-xs: 0 1px 2px rgba(18, 20, 31, 0.05);
+  --et-shadow-sm: 0 2px 8px rgba(18, 20, 31, 0.05), 0 1px 2px rgba(18, 20, 31, 0.04);
+  --et-shadow-md: 0 18px 40px -24px rgba(18, 20, 31, 0.28), 0 4px 14px rgba(18, 20, 31, 0.05);
+  --et-shadow-lg: 0 32px 70px -32px rgba(18, 20, 31, 0.35);
+  --et-ring: 0 0 0 4px rgba(58, 54, 232, 0.16);
+  --et-ring-danger: 0 0 0 4px rgba(207, 55, 66, 0.14);
+
+  /* Layout */
+  --et-nav-width: 268px;
+  --et-topbar-height: 78px;
+  --et-content-max: 1440px;
+
+  /* Movimiento */
+  --et-ease: cubic-bezier(0.22, 0.61, 0.36, 1);
+  --et-fast: 140ms;
+  --et-base: 220ms;
+}
+
+[data-theme='dark'] {
+  color-scheme: dark;
+
+  --et-bg: #070a13;
+  --et-surface: #0f1422;
+  --et-surface-2: #0b101c;
+  --et-surface-3: #161d2e;
+  --et-surface-inverse: #f3f4f9;
+
+  --et-line: #1f2739;
+  --et-line-soft: #171e2e;
+  --et-line-strong: #2e3750;
+
+  --et-text: #eef0f7;
+  --et-text-soft: #a6adbf;
+  --et-text-mute: #747c90;
+  --et-text-inverse: #0a0d18;
+
+  --et-primary: #7d79ff;
+  --et-primary-deep: #6661ff;
+  --et-primary-soft: #1a1b3d;
+  --et-primary-ink: #ffffff;
+  --et-accent: #d6f76a;
+  --et-accent-strong: #c3ea45;
+  --et-accent-ink: #182300;
+
+  --et-success: #3acb96;
+  --et-success-soft: #0c2a22;
+  --et-success-ink: #8ef0c9;
+  --et-warn: #e5a53c;
+  --et-warn-soft: #2c2110;
+  --et-warn-ink: #ffd18a;
+  --et-danger: #f0646d;
+  --et-danger-soft: #2e1418;
+  --et-danger-ink: #ffb1b6;
+  --et-info: #6aa1ff;
+  --et-info-soft: #12233e;
+
+  --et-sidebar: #05070f;
+  --et-sidebar-2: #0a0e1b;
+  --et-sidebar-text: #c9ccda;
+  --et-sidebar-muted: #737a8f;
+  --et-sidebar-line: rgba(255, 255, 255, 0.07);
+  --et-sidebar-active: rgba(255, 255, 255, 0.06);
+
+  --et-shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.3);
+  --et-shadow-sm: 0 2px 10px rgba(0, 0, 0, 0.28);
+  --et-shadow-md: 0 18px 40px -24px rgba(0, 0, 0, 0.65), 0 4px 14px rgba(0, 0, 0, 0.3);
+  --et-shadow-lg: 0 32px 70px -32px rgba(0, 0, 0, 0.8);
+  --et-ring: 0 0 0 4px rgba(125, 121, 255, 0.2);
+  --et-ring-danger: 0 0 0 4px rgba(240, 100, 109, 0.18);
+}

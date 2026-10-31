@@ -1,0 +1,37 @@
+# Dependencies
+node_modules
+
+# Build
+dist
+coverage
+out-tsc
+
+# Nx / Angular caches
+.nx
+.angular
+.cache
+
+# Tests
+vitest.config.*.timestamp*
+test-output
+
+# Environment overrides
+.env
+.env.local
+
+# Editors
+.idea
+.vscode/*
+!.vscode/extensions.json
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# OS
+.DS_Store
+Thumbs.db
+
+# graphify es local, nunca se versiona
+graphify-out

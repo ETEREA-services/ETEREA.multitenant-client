@@ -1,17 +1,32 @@
 # Eterea · Clientes multiempresa
 
+![Angular](https://img.shields.io/badge/Angular-22-DD0031?logo=angular&logoColor=white)
+![Nx](https://img.shields.io/badge/Nx-23-143055?logo=nx&logoColor=white)
+![TypeScript](https://img.shields.io/badge/TypeScript-6.0-3178C6?logo=typescript&logoColor=white)
+![Tailwind CSS](https://img.shields.io/badge/Tailwind%20CSS-4.2-06B6D4?logo=tailwindcss&logoColor=white)
+![Node.js](https://img.shields.io/badge/Node.js-22-5FA04E?logo=node.js&logoColor=white)
+![npm](https://img.shields.io/badge/npm-11-CB3837?logo=npm&logoColor=white)
+![ESLint](https://img.shields.io/badge/ESLint-9-4B32C3?logo=eslint&logoColor=white)
+![Prettier](https://img.shields.io/badge/Prettier-3-F7B93E?logo=prettier&logoColor=black)
+![Docker](https://img.shields.io/badge/Docker-multietapa-2496ED?logo=docker&logoColor=white)
+![Nginx](https://img.shields.io/badge/Nginx-reverse%20proxy-009639?logo=nginx&logoColor=white)
+![GitHub Actions](https://img.shields.io/badge/GitHub%20Actions-CI-2088FF?logo=githubactions&logoColor=white)
+
 Clientes Angular para operar la contabilidad y la administración de varias
-empresas desde un mismo espacio de trabajo. El repositorio está en **etapa de
-estructura**: la navegación, las capas y el sistema de diseño están armados; la
-lógica de negocio se incorpora en pasos posteriores.
+empresas desde un mismo espacio de trabajo. Incluye autenticación contra Brain,
+selección de contexto empresa → negocio y los primeros módulos operativos:
+plan de cuentas, ejercicios, coeficientes de inflación y reportes en Contable;
+empresas, negocios, usuarios y asignaciones en Administrador.
 
 ## Stack
 
-- **Angular 22** (standalone components, signals y rutas lazy).
-- **Nx 23** como workspace multi-app (`apps/` + `libs/`).
-- **Tailwind CSS 4** como base de estilos, con un sistema de diseño propio en CSS.
-- **Vitest** previsto para la capa de datos (configuración pendiente).
-- **ESLint + Prettier** con reglas de límites entre librerías.
+- **Angular 22.1** (standalone components, signals y rutas lazy).
+- **Nx 23.3** como workspace multi-app (`apps/` + `libs/`).
+- **TypeScript 6.0** en modo `strict` con `strictTemplates`.
+- **Tailwind CSS 4.2** como base de estilos, con un sistema de diseño propio en CSS.
+- **Vitest 4** previsto para pruebas (targets y configuración pendientes).
+- **ESLint 9 + Prettier 3** con reglas de límites entre librerías.
+- **Node.js 22 + npm 11** como toolchain (validado en CI).
 - **Docker** multietapa con Nginx para publicar las apps.
 
 ## Puesta en marcha
@@ -32,12 +47,14 @@ apps/
 ├── contable/                   # host: bootstrap, rutas raíz y shell
 └── administrador/              # host de administración global
 libs/
-├── shared-api/                 # tenant, interceptor, tokens, env y formato
+├── shared-api/                 # sesión, tenant, interceptores, tokens, env y formato
 ├── ui-layout/                  # sistema de diseño: shell, iconos, page header
-├── feature-session/            # login y selector de empresa (estructura visual)
-├── contable-data-access/       # modelos y contrato del repositorio contable
+├── feature-session/            # login, cambio de contraseña y selector de contexto
+├── contable-data-access/       # modelos y contratos + repositorios HTTP contables
 ├── feature-contable/           # rutas y páginas del módulo contable
-├── administrador-data-access/  # modelos y contrato del repositorio de administración
+├── reporte-shared/             # contrato genérico de reportes (ReporteDatos)
+├── ui-reportes/                # shell de reportes, vista previa, descarga e impresión
+├── administrador-data-access/  # modelos y contrato + repositorio HTTP de administración
 └── feature-administrador/      # rutas y páginas del módulo administrador
 ```
 
@@ -50,17 +67,23 @@ libs/
   `feature-administrador` se cargan con `loadChildren`; `feature-session` se
   importa de forma estática porque el shell de Contable también usa el diálogo de
   cambio de contexto.
-- **`shared-api`** resuelve el contexto multiempresa:
+- **`shared-api`** resuelve la sesión y el contexto multiempresa:
+  - `AuthStore` mantiene el access token en memoria y expone el usuario activo.
   - `ContextoStore` mantiene la jerarquía empresa → negocio y la selección activa
     en `sessionStorage` (una por solapa).
   - `contextoInterceptor` agrega `X-Tenant-Id` con `negocio.tenantId`.
   - `contextoGuard` exige empresa y negocio elegidos.
   - `API_URL`, `APP_ENV_INFO` y helpers de formato son transversales.
-- **`contable-data-access`** define los modelos base y el contrato
-  `ContableRepository`. Todavía no tiene implementación HTTP.
+- **`contable-data-access`** define los modelos y contratos contables, más sus
+  implementaciones HTTP contra `/api/tenant/core`: cuentas, ejercicios,
+  coeficientes de inflación y reporte de Plan de Cuentas. `ContableRepository`
+  (snapshot del módulo) sigue sin implementación.
 - **`administrador-data-access`** define los modelos de empresa, negocio, usuario
-  y asignaciones, más el contrato `AdministradorRepository`. El cliente de
+  y asignaciones, el contrato `AdministradorRepository` y su implementación HTTP
+  `AdministradorHttpRepository` contra `/api/brain/core`. El cliente de
   administración es global: no depende de una empresa activa.
+- **`reporte-shared`** define el contrato genérico `ReporteDatos`; **`ui-reportes`**
+  lo consume para armar la vista previa, la descarga de PDF y la impresión.
 - **`ui-layout`** concentra la identidad visual y no depende de ninguna otra
   librería del workspace.
 
@@ -77,7 +100,12 @@ flowchart LR
   session --> layout
   session --> shared
   contable --> layout
+  contable --> shared
+  contable --> uiReportes["ui-reportes"]
   contable -. contrato .-> contableData["contable-data-access"]
+  contableData --> reporteShared["reporte-shared"]
+  uiReportes --> layout
+  uiReportes --> reporteShared
   admin --> layout
   admin -. contrato .-> adminData["administrador-data-access"]
 ```
@@ -89,27 +117,30 @@ Los límites están enforced por `@nx/enforce-module-boundaries` en
 
 ### Contable
 
-| Ruta                | Pantalla                   | Estado     |
-| ------------------- | -------------------------- | ---------- |
-| `/`                 | Resumen del módulo         | estructura |
-| `/plan-cuentas`     | Plan de cuentas            | estructura |
-| `/asientos`         | Asientos                   | estructura |
-| `/mayor`            | Libro mayor                | estructura |
-| `/balance`          | Balance e informes         | estructura |
-| `/periodos`         | Períodos contables         | estructura |
-| `/centros-costo`    | Centros de costo           | estructura |
-| `/configuracion`    | Configuración              | estructura |
-| `/login`            | Ingreso                    | operativa  |
-| `/empresas`         | Selector empresa → negocio | operativa  |
-| `/cambiar-password` | Cambiar contraseña         | operativa  |
+| Ruta                      | Pantalla                   | Estado     |
+| ------------------------- | -------------------------- | ---------- |
+| `/`                       | Resumen del módulo         | estructura |
+| `/plan-cuentas`           | Plan de cuentas            | operativa  |
+| `/reportes/plan-cuentas`  | Reporte de Plan de Cuentas | operativa  |
+| `/ejercicios`             | Ejercicios contables       | operativa  |
+| `/inflacion/coeficientes` | Coeficientes de inflación  | operativa  |
+| `/asientos`               | Asientos                   | estructura |
+| `/mayor`                  | Libro mayor                | estructura |
+| `/balance`                | Balance e informes         | estructura |
+| `/periodos`               | Períodos contables         | estructura |
+| `/centros-costo`          | Centros de costo           | estructura |
+| `/configuracion`          | Configuración              | estructura |
+| `/login`                  | Ingreso                    | operativa  |
+| `/empresas`               | Selector empresa → negocio | operativa  |
+| `/cambiar-password`       | Cambiar contraseña         | operativa  |
 
 ### Administrador
 
 | Ruta                | Pantalla                          | Estado     |
 | ------------------- | --------------------------------- | ---------- |
 | `/`                 | Resumen de la plataforma          | estructura |
-| `/empresas`         | Empresas registradas              | estructura |
-| `/negocios`         | Negocios y conexiones             | estructura |
+| `/empresas`         | Empresas registradas              | operativa  |
+| `/negocios`         | Negocios y conexiones             | operativa  |
 | `/usuarios`         | Usuarios de la plataforma         | operativa  |
 | `/asignaciones`     | Usuario–empresa y usuario–negocio | operativa  |
 | `/configuracion`    | Parámetros generales              | estructura |
@@ -123,13 +154,23 @@ Los límites están enforced por `@nx/enforce-module-boundaries` en
   `PUT /api/brain/core/usuario/{usuarioId}/password`, exige la contraseña actual y
   cierra la sesión al guardar.
 - Access token JWT en memoria; refresh token opaco en cookie `HttpOnly`/
-  `SameSite=Strict`.
+  `SameSite=Strict`, compartida entre solapas.
 - `authInterceptor` agrega el Bearer y refresca una vez ante `401`.
-- Guards: `authGuard`, `guestGuard`, `adminGuard` y `contextoGuard`.
+- Guards: `authGuard`, `guestGuard`, `adminGuard`, `contextoGuard` y
+  `pendingPasswordChangeGuard` (bloquea el shell hasta definir una clave nueva).
 - El módulo Administrador exige `administrador = true`; Contable carga las
   empresas/negocios asignados y usa `negocio.tenantId` como `X-Tenant-Id`.
 - En desarrollo, `proxy.conf.json` redirige `/api` al gateway en
   `http://localhost:9050`.
+
+## Reportes
+
+- El PDF se genera en el core con OpenPDF; el frontend pide los datos para la
+  vista previa (`POST /api/tenant/core/reporte/<slug>/datos`) o el binario para
+  descargar e imprimir (`POST .../<slug>/pdf`).
+- El tenant viaja en `X-Tenant-Id`; el body no incluye `tenantId` ni `negocioId`.
+- `reporte-shared` define `ReporteDatos` y `ui-reportes` resuelve vista previa,
+  descarga e impresión. El primer reporte operativo es `/reportes/plan-cuentas`.
 
 ## Sistema de diseño
 
@@ -149,25 +190,30 @@ Las reglas de uso están en [`AGENTS.md`](./AGENTS.md).
 
 Listo:
 
-- Workspace Nx con dos apps, siete librerías y aliases `@eterea/*`.
-- Shell, navegación, tema claro/oscuro y páginas vacías de ambos módulos.
-- Contrato de contexto (`ContextoStore`, interceptor, guard), pantalla obligatoria
-  empresa → negocio, cambio de contexto en modal y contratos de datos.
+- Workspace Nx con dos apps, nueve librerías y aliases `@eterea/*`.
+- Shell, navegación, tema claro/oscuro, indicador de entorno y diseño responsive
+  en ambos módulos.
+- Contexto multiempresa (`ContextoStore`, interceptor, guard), pantalla
+  obligatoria empresa → negocio, cambio de contexto en modal y persistencia por
+  solapa.
 - Login común contra Brain con JWT en memoria, refresh token en cookie HttpOnly,
   guards de sesión/rol, logout y carga real de empresas/negocios asignados.
 - Cambio de contraseña desde el menú de usuario en ambos módulos, con cierre de
   sesión al completar.
-- Administrador: listado de usuarios, blanqueo de contraseñas y asignaciones
+- Contable: plan de cuentas con árbol, alta/edición/baja, ejercicios con bloqueo
+  y eliminación, coeficientes de inflación mensuales y reporte de Plan de Cuentas
+  con vista previa, PDF e impresión.
+- Administrador: alta y edición de empresas y negocios (con `tenantId` generado
+  en el cliente), listado de usuarios, blanqueo de contraseñas y asignaciones
   usuario–empresa / usuario–negocio con activación, desactivación y cascada.
-- Build de producción y lint sin errores.
+- Build de producción, lint sin errores y CI en GitHub Actions.
 
 Pendiente de implementar por pasos:
 
-1. Implementación HTTP de `ContableRepository`.
-2. Plan de cuentas, asientos, mayor, balance, períodos y centros de costo.
-3. Alta y edición de empresas y negocios desde el Administrador.
-4. Pruebas unitarias de las capas de datos y de los cálculos contables.
-5. Pipeline de despliegue y configuración de entornos.
+1. Implementación HTTP de `ContableRepository` (snapshot del módulo contable).
+2. Asientos, mayor, balance, períodos y centros de costo.
+3. Pruebas unitarias de las capas de datos y de los cálculos contables.
+4. Pipeline de despliegue y configuración de entornos.
 
 ## Docker
 
@@ -193,7 +239,11 @@ certificado auto-firmado (el `80` solo redirige) y proxya `/api/` al gateway
 multitenant. `API_URL`, `ENV_NAME` y `APP_VERSION` se inyectan en runtime: el
 bundle de producción solo contiene los placeholders.
 
-> Nota: el gateway ya expone `/api/brain/**` para el login común y los endpoints
-> de administración, además de `/api/tenant/core/**` y `/api/unificado/core/**`.
-> El login legacy de tenant (`/api/v1/auth/**`) fue eliminado. Al implementar
-> `AdministradorRepository`, usar `API_URL=/api/brain/core`.
+El workflow `.github/workflows/ci.yml` corre con Node.js 22 sobre cada pull
+request y sobre `main`: `npm ci`, lint de todos los proyectos y build de
+producción de Contable.
+
+> Nota: el gateway expone `/api/brain/**` para el login común y los endpoints de
+> administración, además de `/api/tenant/core/**` y `/api/unificado/core/**`.
+> El login legacy de tenant (`/api/v1/auth/**`) fue eliminado. Administrador usa
+> `API_URL=/api/brain/core`.

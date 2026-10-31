@@ -1,0 +1,403 @@
+<et-page-header
+  eyebrow="Estructura"
+  title="Plan de cuentas"
+  description="Cuentas contables del negocio activo, organizadas por la jerarquía del código."
+>
+  <button class="et-btn et-btn--ghost" type="button" (click)="cargar()" [disabled]="cargando()">
+    <et-icon name="swap" [size]="16" />
+    {{ cargando() ? 'Actualizando…' : 'Actualizar' }}
+  </button>
+  <a class="et-btn et-btn--ghost" routerLink="/reportes/plan-cuentas">
+    <et-icon name="file" [size]="16" />
+    Reporte
+  </a>
+  <button class="et-btn et-btn--primary" type="button" (click)="abrirAlta()">
+    <et-icon name="plus" [size]="16" />
+    Nueva cuenta
+  </button>
+</et-page-header>
+
+@if (error(); as mensaje) {
+  <div class="cuenta__alerta" role="alert">
+    <div>
+      <p class="et-error">{{ mensaje }}</p>
+      @if (sinPermiso()) {
+        <p class="et-muted">
+          Tu usuario no tiene asignado este negocio o le falta el permiso necesario.
+        </p>
+      }
+    </div>
+    <button class="et-btn et-btn--sm" type="button" (click)="cargar()">Reintentar</button>
+  </div>
+}
+
+<div class="cuenta__layout">
+  <section class="et-card cuenta__panel" aria-labelledby="cuenta-arbol-titulo">
+    <header class="cuenta__panel-head">
+      <div>
+        <h2 id="cuenta-arbol-titulo">Cuentas</h2>
+        <p class="et-muted">
+          {{ cuentas().length }} cuentas · {{ cuentasDeMovimiento() }} de movimiento
+        </p>
+      </div>
+      <span class="et-badge et-badge--outline">{{ filas().length }} visibles</span>
+    </header>
+
+    <div class="cuenta__filtros">
+      <label class="et-field cuenta__buscador">
+        <span class="et-label">Buscar</span>
+        <span class="cuenta__buscador-input">
+          <et-icon name="search" [size]="15" />
+          <input
+            class="et-input"
+            type="search"
+            placeholder="Código o nombre"
+            autocomplete="off"
+            [ngModel]="filtro()"
+            (ngModelChange)="actualizarFiltro($event)"
+            [ngModelOptions]="{ standalone: true }"
+          />
+        </span>
+      </label>
+      <label class="cuenta__check">
+        <input
+          type="checkbox"
+          [ngModel]="soloMovimiento()"
+          (ngModelChange)="alternarSoloMovimiento($event)"
+          [ngModelOptions]="{ standalone: true }"
+        />
+        Sólo de movimiento
+      </label>
+      @if (filtro() || soloMovimiento()) {
+        <button class="et-btn et-btn--ghost et-btn--sm" type="button" (click)="limpiarFiltros()">
+          <et-icon name="close" [size]="14" />
+          Limpiar
+        </button>
+      }
+    </div>
+
+    <div class="cuenta__arbol" role="tree" aria-label="Árbol de cuentas">
+      @if (cargando() && cuentas().length === 0) {
+        <div class="cuenta__estado">
+          <p class="et-muted">Cargando cuentas…</p>
+        </div>
+      } @else if (sinPermiso()) {
+        <et-empty-state
+          icon="lock"
+          title="Sin permiso"
+          description="No podés ver el plan de cuentas de este negocio con tu usuario actual."
+        />
+      } @else if (cuentas().length === 0) {
+        <et-empty-state
+          icon="tree"
+          title="El plan de cuentas está vacío"
+          description="Creá la primera cuenta del negocio para empezar a armar la jerarquía."
+        >
+          <button class="et-btn et-btn--primary" type="button" (click)="abrirAlta()">
+            <et-icon name="plus" [size]="16" />
+            Nueva cuenta
+          </button>
+        </et-empty-state>
+      } @else if (filas().length === 0) {
+        <et-empty-state
+          icon="search"
+          title="Sin resultados"
+          description="Ninguna cuenta coincide con la búsqueda o los filtros aplicados."
+        >
+          <button class="et-btn" type="button" (click)="limpiarFiltros()">Limpiar filtros</button>
+        </et-empty-state>
+      } @else {
+        @for (fila of filas(); track fila.nodo.cuenta.numeroCuenta; let i = $index) {
+          <div
+            class="cuenta__fila"
+            role="treeitem"
+            data-fila
+            [class.is-activa]="seleccionada()?.numeroCuenta === fila.nodo.cuenta.numeroCuenta"
+            [attr.aria-level]="fila.profundidad + 1"
+            [attr.aria-expanded]="fila.tieneHijos ? fila.expandido : null"
+            [attr.aria-selected]="seleccionada()?.numeroCuenta === fila.nodo.cuenta.numeroCuenta"
+            [attr.tabindex]="codigoFoco() === fila.nodo.cuenta.numeroCuenta ? 0 : -1"
+            [style.padding-inline-start.px]="8 + fila.profundidad * 16"
+            (click)="seleccionar(fila)"
+            (keydown)="alTeclearArbol($event)"
+            (keydown.enter)="seleccionar(fila)"
+            (keydown.space)="seleccionar(fila); $event.preventDefault()"
+          >
+            @if (fila.tieneHijos) {
+              <button
+                class="cuenta__toggle"
+                type="button"
+                [attr.aria-label]="fila.expandido ? 'Contraer cuenta' : 'Expandir cuenta'"
+                (click)="alternar(fila, $event)"
+              >
+                <et-icon [name]="fila.expandido ? 'chevron-down' : 'chevron-right'" [size]="14" />
+              </button>
+            } @else {
+              <span class="cuenta__toggle cuenta__toggle--vacio" aria-hidden="true"></span>
+            }
+
+            <div class="cuenta__fila-texto">
+              <div class="cuenta__fila-linea">
+                <code class="et-mono">{{ fila.nodo.cuenta.numeroCuenta }}</code>
+                <strong>{{ fila.nodo.cuenta.nombre }}</strong>
+              </div>
+              <div class="cuenta__badges">
+                <span class="et-badge et-badge--outline">
+                  {{ estadoCuenta(fila.nodo.cuenta) }}
+                </span>
+                @for (flag of flagsActivas(fila.nodo.cuenta); track flag) {
+                  <span class="et-badge">{{ flag }}</span>
+                }
+                @if (fila.nodo.huerfana) {
+                  <span class="et-badge et-badge--warn">Huérfana</span>
+                }
+              </div>
+            </div>
+          </div>
+        }
+      }
+    </div>
+  </section>
+
+  <section class="et-card cuenta__panel cuenta__panel--detalle">
+    @if (modo() === 'crear' || modo() === 'editar') {
+      <form class="cuenta__detalle" (ngSubmit)="guardar()">
+        <header class="cuenta__detalle-cabecera">
+          <div>
+            <span class="et-eyebrow">{{ modo() === 'crear' ? 'Alta' : 'Edición' }}</span>
+            <h2>{{ modo() === 'crear' ? 'Nueva cuenta' : 'Editar cuenta' }}</h2>
+            <p class="et-muted">
+              {{
+                modo() === 'crear'
+                  ? 'El código define la jerarquía: los ancestros deben existir antes de dar de alta la cuenta.'
+                  : 'El código no se modifica. Los datos jerárquicos se recalculan en el servidor.'
+              }}
+            </p>
+          </div>
+          <button
+            class="et-btn et-btn--icon et-btn--sm"
+            type="button"
+            aria-label="Cerrar formulario"
+            (click)="cancelar()"
+            [disabled]="guardando()"
+          >
+            <et-icon name="close" [size]="16" />
+          </button>
+        </header>
+
+        @if (errorFormulario(); as mensaje) {
+          <p class="et-error" role="alert">{{ mensaje }}</p>
+        }
+
+        <div class="cuenta__form">
+          <div class="et-field">
+            <span class="et-label">
+              Código
+              @if (modo() === 'crear') {
+                <span class="cuenta__requerido" aria-hidden="true">*</span>
+              }
+            </span>
+            @if (modo() === 'crear') {
+              <input
+                class="et-input et-mono"
+                name="numeroCuenta"
+                type="text"
+                inputmode="numeric"
+                maxlength="8"
+                required
+                autocomplete="off"
+                aria-label="Código de cuenta"
+                placeholder="11101001"
+                [(ngModel)]="formulario.numeroCuenta"
+              />
+            } @else {
+              <div class="cuenta__fijo">
+                <code class="et-mono">{{ formulario.numeroCuenta }}</code>
+                <span class="et-muted">No editable</span>
+              </div>
+            }
+            <span class="et-hint">Entre 1 y 8 dígitos, distinto de cero.</span>
+          </div>
+
+          <div class="et-field">
+            <span class="et-label">Cuenta maestra</span>
+            <div class="cuenta__fijo">
+              <code class="et-mono">{{ formulario.cuentaMaestro || '0' }}</code>
+              <span class="et-muted">Sólo lectura</span>
+            </div>
+          </div>
+
+          <label class="et-field cuenta__ancho">
+            <span class="et-label">
+              Nombre
+              <span class="cuenta__requerido" aria-hidden="true">*</span>
+            </span>
+            <input
+              class="et-input"
+              name="nombre"
+              type="text"
+              maxlength="200"
+              required
+              autocomplete="off"
+              placeholder="Nombre de la cuenta"
+              [(ngModel)]="formulario.nombre"
+            />
+          </label>
+
+          <fieldset class="cuenta__flags cuenta__ancho">
+            <legend class="et-label">Flags de la cuenta</legend>
+            <label class="cuenta__check">
+              <input type="checkbox" name="transfiere" [(ngModel)]="formulario.transfiere" />
+              Transfiere
+            </label>
+            <label class="cuenta__check">
+              <input
+                type="checkbox"
+                name="movimientoStock"
+                [(ngModel)]="formulario.movimientoStock"
+              />
+              Movimiento de stock
+            </label>
+            <label class="cuenta__check">
+              <input type="checkbox" name="ventas" [(ngModel)]="formulario.ventas" />
+              Ventas
+            </label>
+            <label class="cuenta__check">
+              <input type="checkbox" name="compras" [(ngModel)]="formulario.compras" />
+              Compras
+            </label>
+            <label class="cuenta__check">
+              <input type="checkbox" name="gastos" [(ngModel)]="formulario.gastos" />
+              Gastos
+            </label>
+          </fieldset>
+        </div>
+
+        <footer class="cuenta__acciones">
+          <button class="et-btn" type="button" (click)="cancelar()" [disabled]="guardando()">
+            Cancelar
+          </button>
+          <button class="et-btn et-btn--primary" type="submit" [disabled]="guardando()">
+            {{ guardando() ? 'Guardando…' : 'Guardar' }}
+          </button>
+        </footer>
+      </form>
+    } @else if (seleccionada(); as cuenta) {
+      <div class="cuenta__detalle">
+        <header class="cuenta__detalle-cabecera">
+          <div>
+            <span class="et-eyebrow">Cuenta {{ cuenta.numeroCuenta }}</span>
+            <h2>{{ cuenta.nombre }}</h2>
+            <div class="cuenta__badges">
+              <span class="et-badge et-badge--primary">{{ estadoCuenta(cuenta) }}</span>
+              @for (flag of flagsActivas(cuenta); track flag) {
+                <span class="et-badge">{{ flag }}</span>
+              }
+              @if (esHuerfana(cuenta)) {
+                <span class="et-badge et-badge--warn">Huérfana</span>
+              }
+            </div>
+          </div>
+          <div class="cuenta__detalle-acciones">
+            <button class="et-btn" type="button" (click)="abrirEdicion()">
+              <et-icon name="settings" [size]="16" />
+              Editar
+            </button>
+            @if (esAdministrador()) {
+              <button class="et-btn et-btn--danger" type="button" (click)="solicitarBaja()">
+                <et-icon name="close" [size]="16" />
+                Eliminar
+              </button>
+            }
+          </div>
+        </header>
+
+        @if (errorFormulario(); as mensaje) {
+          <p class="et-error" role="alert">{{ mensaje }}</p>
+        }
+
+        @if (confirmandoBaja()) {
+          <div class="cuenta__confirmar" role="alertdialog" aria-labelledby="cuenta-baja-titulo">
+            <div>
+              <strong id="cuenta-baja-titulo"
+                >¿Eliminar la cuenta {{ cuenta.numeroCuenta }}?</strong
+              >
+              <p class="et-muted">
+                La baja se bloquea si la cuenta tiene subcuentas o movimientos registrados.
+              </p>
+            </div>
+            <div class="cuenta__confirmar-acciones">
+              <button
+                class="et-btn"
+                type="button"
+                (click)="cancelarBaja()"
+                [disabled]="guardando()"
+              >
+                Cancelar
+              </button>
+              <button
+                class="et-btn et-btn--danger"
+                type="button"
+                (click)="eliminar()"
+                [disabled]="guardando()"
+              >
+                {{ guardando() ? 'Eliminando…' : 'Confirmar baja' }}
+              </button>
+            </div>
+          </div>
+        }
+
+        <div class="cuenta__datos">
+          <div class="cuenta__dato">
+            <span class="et-label">Negocio</span>
+            <strong>{{ cuenta.negocioId }}</strong>
+          </div>
+          <div class="cuenta__dato">
+            <span class="et-label">Nivel</span>
+            <strong>{{ cuenta.nivel }}</strong>
+          </div>
+          <div class="cuenta__dato">
+            <span class="et-label">Padre</span>
+            <strong class="et-mono">{{ cuenta.padre || '—' }}</strong>
+          </div>
+          <div class="cuenta__dato">
+            <span class="et-label">Cuenta maestra</span>
+            <strong class="et-mono">{{ cuentaMaestroVisible(cuenta) }}</strong>
+          </div>
+        </div>
+
+        <h3 class="cuenta__seccion">Jerarquía</h3>
+        <div class="cuenta__jerarquia">
+          @for (codigo of jerarquia(cuenta); track codigo) {
+            <span class="et-badge et-badge--outline et-mono">{{ codigo }}</span>
+          } @empty {
+            <span class="et-muted">Cuenta raíz del plan.</span>
+          }
+          <span class="et-muted">Nivel {{ cuenta.nivel }}</span>
+        </div>
+
+        <h3 class="cuenta__seccion">Flags</h3>
+        <ul class="cuenta__flags-lista">
+          <li [class.is-activo]="cuenta.transfiere"><span class="et-dot"></span>Transfiere</li>
+          <li [class.is-activo]="cuenta.movimientoStock">
+            <span class="et-dot"></span>Movimiento de stock
+          </li>
+          <li [class.is-activo]="cuenta.ventas"><span class="et-dot"></span>Ventas</li>
+          <li [class.is-activo]="cuenta.compras"><span class="et-dot"></span>Compras</li>
+          <li [class.is-activo]="cuenta.gastos"><span class="et-dot"></span>Gastos</li>
+        </ul>
+      </div>
+    } @else {
+      <et-empty-state
+        icon="tree"
+        title="Elegí una cuenta"
+        description="Seleccioná una cuenta del árbol para ver su detalle, editarla o dar de alta una nueva."
+      >
+        <button class="et-btn et-btn--primary" type="button" (click)="abrirAlta()">
+          <et-icon name="plus" [size]="16" />
+          Nueva cuenta
+        </button>
+      </et-empty-state>
+    }
+  </section>
+</div>

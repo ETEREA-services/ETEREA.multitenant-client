@@ -1,0 +1,14 @@
+<et-reporte-layout
+  eyebrow="Reportes"
+  titulo="Plan de Cuentas"
+  descripcion="Todas las cuentas del negocio activo, con la jerarquía del código y la cuenta maestra."
+  [datos]="datos()"
+  [cargando]="cargando()"
+  [error]="error()"
+  [sinPermiso]="sinPermiso()"
+  [descargando]="descargando()"
+  (actualizar)="cargar()"
+  (reintentar)="cargar()"
+  (descargar)="descargar()"
+  (imprimir)="imprimir()"
+/>

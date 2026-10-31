@@ -1,0 +1,79 @@
+:host {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: grid;
+  place-items: center;
+  padding: clamp(0.75rem, 3vw, 2rem);
+}
+
+.contexto-dialog__scrim {
+  position: absolute;
+  inset: 0;
+  border: 0;
+  background: rgba(5, 7, 15, 0.55);
+  backdrop-filter: blur(3px);
+  cursor: pointer;
+}
+
+.contexto-dialog__panel {
+  position: relative;
+  width: min(100%, 36rem);
+  max-height: min(88vh, 46rem);
+  overflow-y: auto;
+  padding: clamp(1.1rem, 3vw, 1.6rem);
+  border: 1px solid var(--et-line);
+  border-radius: var(--et-radius-lg);
+  background: var(--et-surface);
+  box-shadow: var(--et-shadow-lg);
+}
+
+.contexto-dialog__panel:focus {
+  outline: none;
+}
+
+.contexto-dialog__head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1.1rem;
+}
+
+.contexto-dialog__text {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  min-width: 0;
+}
+
+.contexto-dialog__text h2 {
+  font-size: 1.15rem;
+}
+
+.contexto-dialog__text p {
+  color: var(--et-text-mute);
+  font-size: 0.78rem;
+}
+
+.contexto-dialog__close {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  flex: none;
+  border: 1px solid var(--et-line);
+  border-radius: 10px;
+  background: var(--et-surface);
+  color: var(--et-text-soft);
+  cursor: pointer;
+  transition:
+    border-color var(--et-fast) var(--et-ease),
+    color var(--et-fast) var(--et-ease);
+}
+
+.contexto-dialog__close:hover {
+  border-color: var(--et-line-strong);
+  color: var(--et-text);
+}

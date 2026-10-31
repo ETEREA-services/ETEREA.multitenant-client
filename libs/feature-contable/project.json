@@ -1,0 +1,13 @@
+{
+  "name": "feature-contable",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/feature-contable/src",
+  "prefix": "et",
+  "projectType": "library",
+  "tags": ["type:feature", "scope:contable"],
+  "targets": {
+    "lint": {
+      "executor": "@nx/eslint:lint"
+    }
+  }
+}

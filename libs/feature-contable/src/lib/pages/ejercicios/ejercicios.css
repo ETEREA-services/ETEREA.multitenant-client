@@ -1,0 +1,142 @@
+:host {
+  display: block;
+}
+
+.ejercicios__alerta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1rem 1.25rem;
+  margin-bottom: 1rem;
+  border: 1px solid var(--et-danger);
+  border-radius: var(--et-radius);
+  background: var(--et-danger-soft);
+}
+
+.ejercicios__alerta p {
+  margin: 0;
+}
+
+.ejercicios__alerta .et-muted {
+  margin-top: 0.25rem;
+  font-size: 0.75rem;
+}
+
+.ejercicios__aviso {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.85rem 1.25rem;
+  margin-bottom: 1rem;
+  border: 1px solid var(--et-primary);
+  border-radius: var(--et-radius);
+  background: var(--et-primary-soft);
+}
+
+.ejercicios__aviso p {
+  margin: 0;
+  color: var(--et-text);
+  font-size: 0.85rem;
+}
+
+.ejercicios__barra {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.9rem 1.25rem;
+  border-bottom: 1px solid var(--et-line);
+}
+
+.ejercicios__barra p {
+  margin: 0;
+  font-size: 0.78rem;
+}
+
+.ejercicios__estado {
+  padding: 1.25rem;
+}
+
+.ejercicios__estado p {
+  margin: 0;
+}
+
+.ejercicios__acciones {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 0.4rem;
+  white-space: nowrap;
+}
+
+.ejercicios__acciones .et-btn {
+  gap: 0.35rem;
+}
+
+.ejercicios__overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.25rem;
+  background: rgb(0 0 0 / 45%);
+}
+
+.ejercicios__dialog {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  width: min(30rem, 100%);
+  padding: 1.4rem;
+  border: 1px solid var(--et-line);
+  border-radius: var(--et-radius-lg);
+  background: var(--et-surface);
+  box-shadow: var(--et-shadow-lg);
+}
+
+.ejercicios__dialog-header {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+}
+
+.ejercicios__dialog-header h2 {
+  margin: 0;
+  font-family: var(--et-font-display);
+  font-size: 1.15rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+.ejercicios__dialog-header p {
+  margin: 0;
+  font-size: 0.8rem;
+  line-height: 1.5;
+}
+
+.ejercicios__fechas {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+
+.ejercicios__dialog-acciones {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  margin-top: 0.25rem;
+}
+
+@media (max-width: 720px) {
+  .ejercicios__acciones {
+    justify-content: flex-start;
+  }
+
+  .ejercicios__fechas {
+    grid-template-columns: 1fr;
+  }
+}

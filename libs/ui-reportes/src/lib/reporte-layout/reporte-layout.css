@@ -1,0 +1,43 @@
+:host {
+  display: block;
+}
+
+.reporte__alerta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1rem 1.25rem;
+  margin-bottom: 1rem;
+  border: 1px solid var(--et-danger);
+  border-radius: var(--et-radius);
+  background: var(--et-danger-soft);
+}
+
+.reporte__alerta p {
+  margin: 0;
+}
+
+.reporte__alerta .et-muted {
+  margin-top: 0.25rem;
+  font-size: 0.75rem;
+}
+
+.reporte__estado {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1.25rem;
+}
+
+.reporte__estado .et-btn {
+  flex: none;
+}
+
+@media (max-width: 720px) {
+  .reporte__estado {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}

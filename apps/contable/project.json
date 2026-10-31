@@ -1,0 +1,83 @@
+{
+  "name": "contable",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "projectType": "application",
+  "prefix": "app",
+  "sourceRoot": "apps/contable/src",
+  "tags": ["type:app", "scope:contable"],
+  "targets": {
+    "build": {
+      "executor": "@angular/build:application",
+      "outputs": ["{options.outputPath}"],
+      "options": {
+        "outputPath": "dist/apps/contable",
+        "browser": "apps/contable/src/main.ts",
+        "tsConfig": "apps/contable/tsconfig.app.json",
+        "assets": [
+          {
+            "glob": "**/*",
+            "input": "apps/contable/public"
+          }
+        ],
+        "styles": ["apps/contable/src/styles.css"]
+      },
+      "configurations": {
+        "production": {
+          "optimization": {
+            "scripts": true,
+            "styles": {
+              "minify": true,
+              "inlineCritical": true
+            },
+            "fonts": false
+          },
+          "budgets": [
+            {
+              "type": "initial",
+              "maximumWarning": "500kb",
+              "maximumError": "1mb"
+            },
+            {
+              "type": "anyComponentStyle",
+              "maximumWarning": "8kb",
+              "maximumError": "12kb"
+            }
+          ],
+          "outputHashing": "all"
+        },
+        "development": {
+          "fileReplacements": [
+            {
+              "replace": "apps/contable/src/environments/environment.ts",
+              "with": "apps/contable/src/environments/environment.development.ts"
+            }
+          ],
+          "optimization": false,
+          "extractLicenses": false,
+          "sourceMap": true
+        }
+      },
+      "defaultConfiguration": "production"
+    },
+    "serve": {
+      "continuous": true,
+      "executor": "@angular/build:dev-server",
+      "options": {
+        "port": 4220,
+        "proxyConfig": "proxy.conf.json"
+      },
+      "configurations": {
+        "production": {
+          "buildTarget": "contable:build:production"
+        },
+        "development": {
+          "buildTarget": "contable:build:development"
+        }
+      },
+      "defaultConfiguration": "development"
+    },
+    "lint": {
+      "executor": "@nx/eslint:lint"
+    }
+  }
+}
