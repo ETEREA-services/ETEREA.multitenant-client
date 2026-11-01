@@ -3,8 +3,6 @@
   [title]="titulo()"
   [description]="descripcion()"
 >
-  <ng-content select="[reporteFiltros]" />
-
   <button
     class="et-btn et-btn--ghost"
     type="button"
@@ -34,7 +32,21 @@
     <et-icon name="download" [size]="16" />
     {{ descargando() ? 'Generando…' : 'Descargar PDF' }}
   </button>
+
+  @if (mostrarExportarXlsx()) {
+    <button
+      class="et-btn et-btn--ghost"
+      type="button"
+      [disabled]="exportando() || !datos()"
+      (click)="exportar.emit()"
+    >
+      <et-icon name="download" [size]="16" />
+      {{ exportando() ? 'Exportando…' : 'Exportar XLSX' }}
+    </button>
+  }
 </et-page-header>
+
+<div class="reporte__filtros"><ng-content select="[reporteFiltros]" /></div>
 
 @if (error(); as mensaje) {
   <div class="reporte__alerta" role="alert">
@@ -65,9 +77,9 @@
 } @else if (datos(); as reporte) {
   @if (reporte.filas.length === 0) {
     <et-empty-state
-      icon="file"
-      title="El plan de cuentas está vacío"
-      description="El negocio activo no tiene cuentas cargadas. Creá la primera desde Plan de cuentas."
+      [icon]="iconoVacio()"
+      [title]="tituloVacio()"
+      [description]="descripcionVacio()"
     />
   } @else {
     <et-reporte-preview [datos]="reporte" />

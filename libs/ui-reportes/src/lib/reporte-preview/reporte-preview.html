@@ -3,12 +3,23 @@
     <div class="reporte-preview__titulo">
       <span class="et-eyebrow">{{ datos().titulo }}</span>
       <h2 id="reporte-preview-titulo">{{ datos().negocio }}</h2>
+      @if (datos().subtitulo) {
+        <p class="reporte-preview__subtitulo">{{ datos().subtitulo }}</p>
+      }
     </div>
     <div class="reporte-preview__meta">
       <span class="et-mono">{{ datos().generadoEn }}</span>
       <span class="et-badge et-badge--outline">{{ datos().totalFilas }} filas</span>
     </div>
   </header>
+
+  @if (datos().advertencias?.length) {
+    <div class="reporte-preview__advertencias" role="status">
+      @for (advertencia of datos().advertencias; track $index) {
+        <p>{{ advertencia }}</p>
+      }
+    </div>
+  }
 
   <div class="et-table-wrap reporte-preview__wrap">
     <table class="et-table reporte-preview__tabla">

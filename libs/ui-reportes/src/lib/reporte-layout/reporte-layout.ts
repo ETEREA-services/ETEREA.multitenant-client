@@ -4,6 +4,7 @@ import {
   EtEmptyStateComponent,
   EtIconComponent,
   EtPageHeaderComponent,
+  IconName,
 } from '@eterea/ui-layout';
 import { EtReportePreviewComponent } from '../reporte-preview/reporte-preview';
 
@@ -33,9 +34,15 @@ export class EtReporteLayoutComponent {
   readonly error = input<string | null>(null);
   readonly sinPermiso = input(false);
   readonly descargando = input(false);
+  readonly exportando = input(false);
+  readonly mostrarExportarXlsx = input(false);
+  readonly tituloVacio = input('El reporte está vacío');
+  readonly descripcionVacio = input('No hay datos para los filtros seleccionados.');
+  readonly iconoVacio = input<IconName>('file');
 
   readonly actualizar = output<void>();
   readonly reintentar = output<void>();
   readonly descargar = output<void>();
   readonly imprimir = output<void>();
+  readonly exportar = output<void>();
 }

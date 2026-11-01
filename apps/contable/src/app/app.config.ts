@@ -11,6 +11,8 @@ import {
   provideSessionConfig,
 } from '@eterea/shared-api';
 import {
+  BALANCE_REPORTE_REPOSITORY,
+  BalanceReporteHttpRepository,
   COEFICIENTE_INFLACION_REPOSITORY,
   CoeficienteInflacionHttpRepository,
   CUENTA_REPOSITORY,
@@ -41,6 +43,10 @@ export const appConfig: ApplicationConfig = {
     {
       provide: PLAN_CUENTAS_REPORTE_REPOSITORY,
       useClass: PlanCuentasReporteHttpRepository,
+    },
+    {
+      provide: BALANCE_REPORTE_REPOSITORY,
+      useClass: BalanceReporteHttpRepository,
     },
     {
       provide: COEFICIENTE_INFLACION_REPOSITORY,

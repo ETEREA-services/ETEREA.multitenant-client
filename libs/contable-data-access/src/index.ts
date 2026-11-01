@@ -15,3 +15,6 @@ export * from './lib/coeficiente-inflacion-error';
 export * from './lib/plan-cuentas-reporte-error';
 export * from './lib/plan-cuentas-reporte.repository';
 export * from './lib/plan-cuentas-reporte-http.repository';
+export * from './lib/balance-reporte.models';
+export * from './lib/balance-reporte.repository';
+export * from './lib/balance-reporte-http.repository';

@@ -57,10 +57,6 @@ export class AppShellComponent {
 
   protected readonly navGroups: ReadonlyArray<ShellNavGroup> = [
     {
-      label: 'Panel',
-      items: [{ label: 'Resumen', path: '/', icon: 'grid', exact: true }],
-    },
-    {
       label: 'Maestros',
       items: [
         { label: 'Plan de cuentas', path: '/plan-cuentas', icon: 'tree' },
@@ -73,29 +69,14 @@ export class AppShellComponent {
       ],
     },
     {
-      label: 'Registros',
-      items: [
-        { label: 'Asientos', path: '/asientos', icon: 'book' },
-        { label: 'Libro mayor', path: '/mayor', icon: 'scale' },
-        { label: 'Centros de costo', path: '/centros-costo', icon: 'layers' },
-      ],
-    },
-    {
       label: 'Informes',
-      items: [
-        { label: 'Balance', path: '/balance', icon: 'chart' },
-        { label: 'Períodos', path: '/periodos', icon: 'calendar' },
-      ],
+      items: [{ label: 'Balance', path: '/balance', icon: 'chart' }],
     },
     {
       label: 'Reportes',
       items: [
         { label: 'Plan de Cuentas', path: '/reportes/plan-cuentas', icon: 'file' },
       ],
-    },
-    {
-      label: 'Sistema',
-      items: [{ label: 'Configuración', path: '/configuracion', icon: 'settings' }],
     },
   ];
 
