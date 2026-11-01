@@ -5,6 +5,36 @@ Todos los cambios relevantes de este proyecto se documentan en este archivo.
 El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/)
 y el versionado adopta [SemVer](https://semver.org/lang/es/).
 
+## [0.2.0] - 2026-11-01
+
+### Añadido
+
+- Contable: informe de **Balance** (`/balance`) sobre el negocio activo, con
+  filtros de rango de fechas, inclusión de la apertura y de los asientos de
+  inflación, vista por estructura o por cuenta y selección de moneda de registro
+  y de expresión desde el catálogo de monedas del tenant.
+- Contable: vista previa del balance, descarga en PDF, impresión y exportación a
+  XLSX.
+- `contable-data-access`: contrato `BalanceReporteRepository` e implementación
+  `BalanceReporteHttpRepository` contra `/api/tenant/core/reporte/balance`
+  (`datos`, `pdf`, `xlsx` y `monedas`).
+- `reporte-shared` y `ui-reportes`: `ReporteDatos` admite `subtitulo` y
+  `advertencias`, cada columna declara su `tipo` para la exportación XLSX, y
+  `EtReporteLayoutComponent` incorpora `exportar`, `mostrarExportarXlsx` y los
+  textos e icono configurables del estado vacío.
+
+### Cambiado
+
+- Contable: la raíz `/` redirige a `/plan-cuentas`; el menú del shell y las rutas
+  quedan alineados con las pantallas implementadas.
+- Contable: el balance reacciona al cambio de negocio de `ContextoStore`,
+  recarga el catálogo de monedas y vuelve a la moneda base.
+
+### Eliminado
+
+- Contable: rutas y pantallas placeholder de Resumen, Asientos, Libro mayor,
+  Períodos, Centros de costo y Configuración, junto con sus entradas en el menú.
+
 ## [0.1.0] - 2026-10-31
 
 Primera versión documentada del cliente multiempresa.

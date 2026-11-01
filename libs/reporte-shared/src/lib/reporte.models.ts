@@ -13,6 +13,8 @@ export interface ReporteColumna {
   alineacion: ReporteAlineacion;
   anchoRelativo: number;
   admiteSangria: boolean;
+  /** Tipo de dato usado por la exportación XLSX. */
+  tipo?: 'TEXTO' | 'NUMERO';
 }
 
 export interface ReporteFila {
@@ -27,7 +29,11 @@ export interface ReporteDatos {
   negocio: string;
   /** Fecha de generación en formato `dd-MM-yyyy`. */
   generadoEn: string;
+  /** Período, monedas u otra línea de contexto debajo del título. */
+  subtitulo?: string;
   columnas: readonly ReporteColumna[];
   filas: readonly ReporteFila[];
   totalFilas: number;
+  /** Avisos del backend (por ejemplo, un balance que no cuadra). */
+  advertencias?: readonly string[];
 }

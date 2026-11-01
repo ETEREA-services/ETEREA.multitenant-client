@@ -1,0 +1,47 @@
+:host {
+  display: block;
+}
+
+.balance__filtros {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 0.65rem;
+}
+
+.balance__campo {
+  min-width: 9.5rem;
+}
+
+.balance__campo .et-input {
+  min-width: 9.5rem;
+}
+
+.balance__check {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding-bottom: 0.5rem;
+  color: var(--et-text-soft);
+  font-size: 0.8rem;
+  white-space: nowrap;
+}
+
+.balance__check input {
+  accent-color: var(--et-primary);
+}
+
+@media (max-width: 720px) {
+  .balance__filtros {
+    align-items: stretch;
+  }
+
+  .balance__campo,
+  .balance__campo .et-input {
+    min-width: 100%;
+  }
+
+  .balance__check {
+    padding-bottom: 0;
+  }
+}

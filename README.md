@@ -15,8 +15,8 @@
 Clientes Angular para operar la contabilidad y la administración de varias
 empresas desde un mismo espacio de trabajo. Incluye autenticación contra Brain,
 selección de contexto empresa → negocio y los primeros módulos operativos:
-plan de cuentas, ejercicios, coeficientes de inflación y reportes en Contable;
-empresas, negocios, usuarios y asignaciones en Administrador.
+plan de cuentas, ejercicios, coeficientes de inflación, balance e informes en
+Contable; empresas, negocios, usuarios y asignaciones en Administrador.
 
 ## Stack
 
@@ -76,7 +76,7 @@ libs/
   - `API_URL`, `APP_ENV_INFO` y helpers de formato son transversales.
 - **`contable-data-access`** define los modelos y contratos contables, más sus
   implementaciones HTTP contra `/api/tenant/core`: cuentas, ejercicios,
-  coeficientes de inflación y reporte de Plan de Cuentas. `ContableRepository`
+  coeficientes de inflación, reporte de Plan de Cuentas y balance. `ContableRepository`
   (snapshot del módulo) sigue sin implementación.
 - **`administrador-data-access`** define los modelos de empresa, negocio, usuario
   y asignaciones, el contrato `AdministradorRepository` y su implementación HTTP
@@ -104,10 +104,12 @@ flowchart LR
   contable --> uiReportes["ui-reportes"]
   contable -. contrato .-> contableData["contable-data-access"]
   contableData --> reporteShared["reporte-shared"]
+  contableData --> shared
   uiReportes --> layout
   uiReportes --> reporteShared
   admin --> layout
   admin -. contrato .-> adminData["administrador-data-access"]
+  adminData --> shared
 ```
 
 Los límites están enforced por `@nx/enforce-module-boundaries` en
@@ -117,22 +119,17 @@ Los límites están enforced por `@nx/enforce-module-boundaries` en
 
 ### Contable
 
-| Ruta                      | Pantalla                   | Estado     |
-| ------------------------- | -------------------------- | ---------- |
-| `/`                       | Resumen del módulo         | estructura |
-| `/plan-cuentas`           | Plan de cuentas            | operativa  |
-| `/reportes/plan-cuentas`  | Reporte de Plan de Cuentas | operativa  |
-| `/ejercicios`             | Ejercicios contables       | operativa  |
-| `/inflacion/coeficientes` | Coeficientes de inflación  | operativa  |
-| `/asientos`               | Asientos                   | estructura |
-| `/mayor`                  | Libro mayor                | estructura |
-| `/balance`                | Balance e informes         | estructura |
-| `/periodos`               | Períodos contables         | estructura |
-| `/centros-costo`          | Centros de costo           | estructura |
-| `/configuracion`          | Configuración              | estructura |
-| `/login`                  | Ingreso                    | operativa  |
-| `/empresas`               | Selector empresa → negocio | operativa  |
-| `/cambiar-password`       | Cambiar contraseña         | operativa  |
+| Ruta                      | Pantalla                   | Estado      |
+| ------------------------- | -------------------------- | ----------- |
+| `/`                       | Redirige a `/plan-cuentas` | redirección |
+| `/plan-cuentas`           | Plan de cuentas            | operativa   |
+| `/reportes/plan-cuentas`  | Reporte de Plan de Cuentas | operativa   |
+| `/ejercicios`             | Ejercicios contables       | operativa   |
+| `/inflacion/coeficientes` | Coeficientes de inflación  | operativa   |
+| `/balance`                | Balance (informe)          | operativa   |
+| `/login`                  | Ingreso                    | operativa   |
+| `/empresas`               | Selector empresa → negocio | operativa   |
+| `/cambiar-password`       | Cambiar contraseña         | operativa   |
 
 ### Administrador
 
@@ -170,7 +167,9 @@ Los límites están enforced por `@nx/enforce-module-boundaries` en
   descargar e imprimir (`POST .../<slug>/pdf`).
 - El tenant viaja en `X-Tenant-Id`; el body no incluye `tenantId` ni `negocioId`.
 - `reporte-shared` define `ReporteDatos` y `ui-reportes` resuelve vista previa,
-  descarga e impresión. El primer reporte operativo es `/reportes/plan-cuentas`.
+  descarga de PDF, impresión y exportación XLSX cuando el reporte la habilita.
+  Los reportes operativos son `/reportes/plan-cuentas` y el informe `/balance`,
+  que además elige moneda de registro y de expresión.
 
 ## Sistema de diseño
 
@@ -203,6 +202,9 @@ Listo:
 - Contable: plan de cuentas con árbol, alta/edición/baja, ejercicios con bloqueo
   y eliminación, coeficientes de inflación mensuales y reporte de Plan de Cuentas
   con vista previa, PDF e impresión.
+- Contable: balance general y por cuenta con rango de fechas, apertura, asientos
+  de inflación, monedas de registro y expresión, vista previa, PDF, impresión y
+  exportación XLSX.
 - Administrador: alta y edición de empresas y negocios (con `tenantId` generado
   en el cliente), listado de usuarios, blanqueo de contraseñas y asignaciones
   usuario–empresa / usuario–negocio con activación, desactivación y cascada.
@@ -211,7 +213,7 @@ Listo:
 Pendiente de implementar por pasos:
 
 1. Implementación HTTP de `ContableRepository` (snapshot del módulo contable).
-2. Asientos, mayor, balance, períodos y centros de costo.
+2. Asientos, mayor, períodos y centros de costo.
 3. Pruebas unitarias de las capas de datos y de los cálculos contables.
 4. Pipeline de despliegue y configuración de entornos.
 

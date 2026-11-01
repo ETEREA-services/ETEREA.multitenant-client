@@ -2,6 +2,14 @@
   display: block;
 }
 
+.reporte__filtros {
+  margin-bottom: 1rem;
+}
+
+.reporte__filtros:empty {
+  display: none;
+}
+
 .reporte__alerta {
   display: flex;
   align-items: center;

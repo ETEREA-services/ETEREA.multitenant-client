@@ -1,0 +1,72 @@
+<et-reporte-layout
+  eyebrow="Informes"
+  titulo="Balance"
+  descripcion="Balance General y saldos por cuenta del negocio activo, en la moneda que elijas."
+  [datos]="datos()"
+  [cargando]="cargando()"
+  [error]="error()"
+  [sinPermiso]="sinPermiso()"
+  [descargando]="descargando()"
+  [exportando]="exportando()"
+  [mostrarExportarXlsx]="true"
+  tituloVacio="No hay saldos para el período"
+  descripcionVacio="Probá con otro rango de fechas o incluí apertura/inflación."
+  iconoVacio="chart"
+  (actualizar)="cargar()"
+  (reintentar)="cargar()"
+  (descargar)="descargar()"
+  (imprimir)="imprimir()"
+  (exportar)="exportarXlsx()"
+>
+  <form reporteFiltros class="balance__filtros" [formGroup]="filtros" (ngSubmit)="cargar()">
+    <label class="et-field balance__campo">
+      <span class="et-label">Desde</span>
+      <input class="et-input" type="date" formControlName="desde" autocomplete="off" />
+    </label>
+
+    <label class="et-field balance__campo">
+      <span class="et-label">Hasta</span>
+      <input class="et-input" type="date" formControlName="hasta" autocomplete="off" />
+    </label>
+
+    <label class="et-field balance__campo">
+      <span class="et-label">Vista</span>
+      <select class="et-input" formControlName="modo">
+        <option value="ESTRUCTURA">Balance general</option>
+        <option value="POR_CUENTA">Por cuenta</option>
+      </select>
+    </label>
+
+    <label class="et-field balance__campo">
+      <span class="et-label">Registrado en</span>
+      <select class="et-input" formControlName="monedaRegistroId" [disabled]="cargandoMonedas()">
+        @for (moneda of monedas(); track moneda.monedaId) {
+          <option [ngValue]="moneda.monedaId">{{ moneda.simbolo }} · {{ moneda.nombre }}</option>
+        }
+      </select>
+    </label>
+
+    <label class="et-field balance__campo">
+      <span class="et-label">Expresado en</span>
+      <select class="et-input" formControlName="monedaExpresionId" [disabled]="cargandoMonedas()">
+        @for (moneda of monedas(); track moneda.monedaId) {
+          <option [ngValue]="moneda.monedaId">{{ moneda.simbolo }} · {{ moneda.nombre }}</option>
+        }
+      </select>
+    </label>
+
+    <label class="balance__check">
+      <input type="checkbox" formControlName="incluyeApertura" />
+      Incluir apertura
+    </label>
+
+    <label class="balance__check">
+      <input type="checkbox" formControlName="incluyeInflacion" />
+      Incluir asientos de inflación
+    </label>
+
+    <button class="et-btn et-btn--primary" type="submit" [disabled]="cargando()">
+      Consultar
+    </button>
+  </form>
+</et-reporte-layout>
