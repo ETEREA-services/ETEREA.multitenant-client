@@ -1,7 +1,7 @@
 <et-page-header
   eyebrow="Organización"
   title="Negocios"
-  description="Negocios de la empresa seleccionada y sus conexiones a base de datos y backend."
+  description="Negocios de la empresa seleccionada y sus conexiones a base de datos."
 >
   <button
     class="et-btn et-btn--primary"
@@ -88,7 +88,7 @@
       title="Esta empresa todavía no tiene negocios"
       description="Creá el primer negocio de {{
         empresaSeleccionadaNombre()
-      }} con su conexión a base de datos y backend."
+      }} con su conexión a base de datos."
     />
     <div class="negocios__estado">
       <button class="et-btn et-btn--primary" type="button" (click)="abrirAlta()">
@@ -110,7 +110,6 @@
             <th>Negocio</th>
             <th>TenantID</th>
             <th>Base de datos</th>
-            <th>Backend</th>
             <th><span class="et-sr-only">Acciones</span></th>
           </tr>
         </thead>
@@ -145,7 +144,6 @@
                   <span class="et-muted et-mono">{{ conexion(negocio) }}</span>
                 </div>
               </td>
-              <td class="et-mono et-muted">{{ backend(negocio) }}</td>
               <td class="negocios__acciones">
                 <button class="et-btn et-btn--sm" type="button" (click)="abrirEdicion(negocio)">
                   <et-icon name="settings" [size]="16" />
@@ -310,36 +308,9 @@
             {{
               d.modo === 'editar'
                 ? 'Dejá vacío para conservar la contraseña actual.'
-                : 'Se guarda sólo en el backend; no se vuelve a mostrar.'
+                : 'Se guarda sólo en el servidor; no se vuelve a mostrar.'
             }}
           </span>
-        </label>
-
-        <h3 class="negocios__seccion">Backend</h3>
-
-        <label class="et-field">
-          <span class="et-label">IP / Host</span>
-          <input
-            class="et-input"
-            name="backendIp"
-            type="text"
-            maxlength="50"
-            autocomplete="off"
-            [(ngModel)]="formulario.backendIp"
-          />
-        </label>
-
-        <label class="et-field">
-          <span class="et-label">Puerto</span>
-          <input
-            class="et-input"
-            name="backendPort"
-            type="text"
-            inputmode="numeric"
-            maxlength="5"
-            autocomplete="off"
-            [(ngModel)]="formulario.backendPort"
-          />
         </label>
       </div>
 

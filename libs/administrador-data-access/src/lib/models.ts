@@ -24,8 +24,6 @@ export interface Negocio {
   databaseIp: string;
   databasePort: string;
   databaseUsername: string;
-  backendIp: string;
-  backendPort: string;
   tenantId: string;
 }
 
@@ -45,8 +43,6 @@ export interface NegocioInput {
   databasePort?: string | null;
   databaseUsername?: string | null;
   databasePassword?: string | null;
-  backendIp?: string | null;
-  backendPort?: string | null;
 }
 
 /** Datos mínimos del negocio que viajan embebidos en una asignación. */

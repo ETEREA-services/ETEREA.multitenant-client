@@ -28,8 +28,6 @@ interface FormularioNegocio {
   databasePort: string;
   databaseUsername: string;
   databasePassword: string;
-  backendIp: string;
-  backendPort: string;
 }
 
 const FORMULARIO_VACIO: FormularioNegocio = {
@@ -40,8 +38,6 @@ const FORMULARIO_VACIO: FormularioNegocio = {
   databasePort: '',
   databaseUsername: '',
   databasePassword: '',
-  backendIp: '',
-  backendPort: '',
 };
 
 @Component({
@@ -158,11 +154,6 @@ export class NegociosPageComponent implements OnInit {
     return partes.length > 0 ? partes.join(':') : '—';
   }
 
-  protected backend(negocio: Negocio): string {
-    const partes = [negocio.backendIp, negocio.backendPort].filter(Boolean);
-    return partes.length > 0 ? partes.join(':') : '—';
-  }
-
   protected esPuertoValido(valor: string): boolean {
     return !valor || /^[0-9]{1,5}$/.test(valor);
   }
@@ -197,8 +188,6 @@ export class NegociosPageComponent implements OnInit {
       databasePort: negocio.databasePort ?? '',
       databaseUsername: negocio.databaseUsername ?? '',
       databasePassword: '',
-      backendIp: negocio.backendIp ?? '',
-      backendPort: negocio.backendPort ?? '',
     };
     this.tenantIdFijo.set(negocio.tenantId);
     this.errorDialogo.set(null);
@@ -252,8 +241,6 @@ export class NegociosPageComponent implements OnInit {
       databasePort: this.limpiar(this.formulario.databasePort),
       databaseUsername: this.limpiar(this.formulario.databaseUsername),
       databasePassword: this.limpiar(this.formulario.databasePassword),
-      backendIp: this.limpiar(this.formulario.backendIp),
-      backendPort: this.limpiar(this.formulario.backendPort),
     };
 
     const peticion =
@@ -285,9 +272,6 @@ export class NegociosPageComponent implements OnInit {
     }
     if (!this.esPuertoValido(this.formulario.databasePort)) {
       return 'El puerto de la base de datos debe ser numérico.';
-    }
-    if (!this.esPuertoValido(this.formulario.backendPort)) {
-      return 'El puerto del backend debe ser numérico.';
     }
     if (!this.tenantIdVistaPrevia()) {
       return 'No se pudo generar el TenantID.';
