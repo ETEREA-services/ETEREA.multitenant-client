@@ -1,0 +1,27 @@
+name: Deploy develop
+
+on:
+  pull_request:
+    branches: ['develop']
+  push:
+    branches: ['develop']
+
+concurrency:
+  group: deploy-develop
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  pipeline:
+    uses: ./.github/workflows/deploy-pipeline.yml
+    with:
+      environment: develop
+      apps: '["contable", "administrador"]'
+      deploy: true
+      deployRunners: '["develop"]'
+      deployScript: /home/daniel/docker/multitenant/deploy-multitenant-frontend-develop.sh
+    permissions:
+      contents: read
+    secrets: inherit

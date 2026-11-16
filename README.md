@@ -215,7 +215,7 @@ Pendiente de implementar por pasos:
 1. Implementación HTTP de `ContableRepository` (snapshot del módulo contable).
 2. Asientos, mayor, períodos y centros de costo.
 3. Pruebas unitarias de las capas de datos y de los cálculos contables.
-4. Pipeline de despliegue y configuración de entornos.
+4. Pipelines de staging y producción.
 
 ## Docker
 
@@ -242,8 +242,28 @@ multitenant. `API_URL`, `ENV_NAME` y `APP_VERSION` se inyectan en runtime: el
 bundle de producción solo contiene los placeholders.
 
 El workflow `.github/workflows/ci.yml` corre con Node.js 22 sobre cada pull
-request y sobre `main`: `npm ci`, lint de todos los proyectos y build de
+request a `main` y sobre `main`: `npm ci`, lint de todos los proyectos y build de
 producción de Contable.
+
+## Despliegue continuo
+
+El workflow `.github/workflows/deploy-develop.yml` usa el reutilizable
+`.github/workflows/deploy-pipeline.yml`:
+
+- **Pull request a `develop`**: `npm ci`, lint de todos los proyectos y build de
+  producción de Contable y Administrador.
+- **Push a `develop`**: publica en Docker Hub
+  `${DOCKER_USERNAME}/eterea.multitenant-<app>-client:<sha>` para `contable` y
+  `administrador`, y luego ejecuta en el runner self-hosted `develop` el script
+  `/home/daniel/docker/multitenant/deploy-multitenant-frontend-develop.sh` con el
+  SHA del commit.
+- Las imágenes se etiquetan con el SHA completo; no se publica `latest` desde
+  `develop`.
+- `API_URL`, `ENV_NAME` y `APP_VERSION` se inyectan en runtime: Contable usa
+  `/api/tenant/core` y Administrador `/api/brain/core`, con `ENV_NAME=develop` y
+  `APP_VERSION=<sha>`.
+- El deploy requiere el environment `develop` y los secretos `DOCKER_USERNAME` y
+  `DOCKER_PASSWORD`.
 
 > Nota: el gateway expone `/api/brain/**` para el login común y los endpoints de
 > administración, además de `/api/tenant/core/**` y `/api/unificado/core/**`.
