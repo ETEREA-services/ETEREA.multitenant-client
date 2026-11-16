@@ -1,0 +1,159 @@
+name: Deploy Pipeline
+
+# Workflow reutilizable de despliegue del cliente multitenant.
+# Los llamadores (deploy-develop.yml y, a futuro, staging/main) aportan el
+# environment, la matriz de apps y, si corresponde, el runner y el script de
+# despliegue.
+#
+# Criterios:
+#  - PR: verify corre lint + build de todas las apps. El build de Nx es el único
+#    chequeo de compilación previo a la fusión, porque todavía no hay imagen.
+#  - Push: verify omite el build; el Dockerfile multietapa compila cada app
+#    DENTRO de la imagen, así que la publicación ya es el chequeo de compilación.
+#  - La imagen depende sólo del commit: nunca se copia un `dist/` previo.
+#  - Tag por push: SHA completo del commit. `latest` sólo si publishLatest=true.
+#
+# Pendiente: no se ejecutan tests porque el workspace todavía no define targets
+# `test`. Cuando existan, agregar `npx nx run-many -t test` en verify.
+
+on:
+  workflow_call:
+    inputs:
+      environment:
+        description: GitHub environment usado por los jobs de publicación y despliegue
+        type: string
+        required: true
+      apps:
+        description: Lista JSON de apps a construir (matriz)
+        type: string
+        required: true
+      deploy:
+        description: Ejecutar el despliegue en el runner self-hosted
+        type: boolean
+        required: false
+        default: false
+      deployRunners:
+        description: Lista JSON de labels de runners (cada label es también el environment del leg)
+        type: string
+        required: false
+        default: '[]'
+      deployScript:
+        description: Script de despliegue ejecutado en el runner
+        type: string
+        required: false
+        default: ''
+      publishLatest:
+        description: Publicar además el tag latest
+        type: boolean
+        required: false
+        default: false
+    secrets:
+      DOCKER_USERNAME:
+        required: true
+      DOCKER_PASSWORD:
+        required: true
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    name: Verify application
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci --no-audit --no-fund
+
+      - name: Lint all projects
+        run: npx nx run-many -t lint --output-style=static
+
+      # En los PR la imagen no se construye, así que el build de Nx es el único
+      # chequeo de compilación previo a la fusión. En el push se omite porque el
+      # Dockerfile multietapa ya compila cada app dentro de la imagen.
+      - name: Build all apps
+        if: github.event_name == 'pull_request'
+        run: npx nx run-many -t build --configuration=production --output-style=static
+
+  publish-docker:
+    name: Build and publish ${{ inputs.environment }} images
+    needs: verify
+    if: github.event_name == 'push'
+    runs-on: ubuntu-latest
+    environment:
+      name: ${{ inputs.environment }}
+    strategy:
+      fail-fast: false
+      matrix:
+        app: ${{ fromJSON(inputs.apps) }}
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v4
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Extract metadata for Docker image
+        id: meta
+        uses: docker/metadata-action@v6
+        with:
+          images: ${{ secrets.DOCKER_USERNAME }}/eterea.multitenant-${{ matrix.app }}-client
+          tags: |
+            type=raw,value=${{ github.sha }}
+            ${{ inputs.publishLatest && 'latest' || '' }}
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v4
+
+      # Etapa de compilación dentro de la imagen: no hay upload/download de
+      # dist/. La imagen depende sólo del commit chequeado.
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v7
+        with:
+          context: .
+          file: docker/app.Dockerfile
+          build-args: |
+            APP=${{ matrix.app }}
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha,scope=${{ inputs.environment }}-${{ matrix.app }}
+          cache-to: type=gha,scope=${{ inputs.environment }}-${{ matrix.app }},mode=max
+
+  deploy:
+    name: Deploy ${{ inputs.environment }} services (${{ matrix.runner }})
+    needs: publish-docker
+    if: github.event_name == 'push' && inputs.deploy
+    strategy:
+      fail-fast: false
+      matrix:
+        runner: ${{ fromJSON(inputs.deployRunners) }}
+    runs-on: [self-hosted, linux, '${{ matrix.runner }}']
+    environment:
+      name: ${{ matrix.runner }}
+    permissions:
+      contents: read
+
+    steps:
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v4
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Deploy multitenant frontend clients
+        run: ${{ inputs.deployScript }} "${GITHUB_SHA}"

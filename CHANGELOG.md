@@ -5,6 +5,32 @@ Todos los cambios relevantes de este proyecto se documentan en este archivo.
 El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/)
 y el versionado adopta [SemVer](https://semver.org/lang/es/).
 
+## [0.3.0] - 2026-11-16
+
+### Añadido
+
+- ci(actions): workflow reutilizable `deploy-pipeline.yml` (verify, publicación
+  de imágenes por matriz de apps y despliegue en runner self-hosted) y
+  `deploy-develop.yml` para PRs y pushes a `develop`.
+- ci(docker): publicación de `eterea.multitenant-contable-client` y
+  `eterea.multitenant-administrador-client` en Docker Hub etiquetadas con el SHA
+  completo del commit.
+- ci(deploy): despliegue en el runner self-hosted `develop` mediante
+  `/home/daniel/docker/multitenant/deploy-multitenant-frontend-develop.sh` con el
+  SHA del commit.
+
+### Cambiado
+
+- ci(actions): `ci.yml` limita los pull request a `main`; los PRs a `develop`
+  quedan cubiertos por `deploy-develop.yml` para evitar lint/build duplicados.
+- docs: README y `AGENTS.md` documentan el flujo de despliegue a `develop`.
+
+### Eliminado
+
+- Administrador: los modelos `Negocio` y `NegocioInput` ya no incluyen `backendIp`
+  ni `backendPort`, y el alta/edición de negocios perdió la sección Backend. La
+  pantalla sólo gestiona la conexión a la base de datos y el TenantID.
+
 ## [0.2.0] - 2026-11-01
 
 ### Añadido

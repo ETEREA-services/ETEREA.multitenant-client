@@ -132,6 +132,24 @@ Formato: Prettier, 100 columnas, comillas simples, parser Angular para HTML, 2 e
   8 kB warning / 12 kB error.
 - Tests: pendientes de configurar; no afirmar cobertura inexistente.
 
+## Despliegue
+
+- `.github/workflows/ci.yml` valida PRs a `main` y pushes a `main` (lint + build
+  de Contable).
+- `.github/workflows/deploy-develop.yml` atiende PRs y pushes a `develop` mediante
+  el reutilizable `.github/workflows/deploy-pipeline.yml`:
+  - PR: lint de todos los proyectos y build de producción de Contable y
+    Administrador.
+  - Push: publica `${DOCKER_USERNAME}/eterea.multitenant-<app>-client:<sha>` para
+    `contable` y `administrador` y despliega en el runner self-hosted `develop`
+    con `/home/daniel/docker/multitenant/deploy-multitenant-frontend-develop.sh`.
+- El deploy usa el environment `develop` y los secretos `DOCKER_USERNAME` /
+  `DOCKER_PASSWORD`. El compose de develop inyecta `API_URL` por app
+  (`/api/tenant/core` y `/api/brain/core`), `ENV_NAME=develop` y
+  `APP_VERSION=<sha>`.
+- No hay targets `test` en el workspace: el pipeline no corre tests hasta que se
+  configuren.
+
 ## Integración con el backend
 
 El login común ya está implementado en `feature-session` y usa `shared-api`:
