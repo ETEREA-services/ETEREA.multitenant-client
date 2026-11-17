@@ -60,7 +60,10 @@ Formato: Prettier, 100 columnas, comillas simples, parser Angular para HTML, 2 e
 - Primitivas: `libs/ui-layout/src/styles/ui.css` (`et-btn`, `et-card`, `et-input`,
   `et-table`, `et-badge`, `et-eyebrow`, `et-amount`, etc.).
 - Shell: `et-shell` con grupos de navegación, empresa activa, usuario y tema.
-- Componentes compartidos: `et-icon`, `et-page-header`, `et-empty-state`.
+- Componentes compartidos: `et-icon`, `et-page-header`, `et-empty-state`,
+  `et-date-input`.
+- Los campos de fecha usan `et-date-input` (`dd/MM/aaaa` visible, valor ISO
+  `yyyy-MM-dd` en el formulario) para no depender del formato del navegador.
 - No crear paletas ni estilos ad hoc por pantalla: usar tokens y clases `et-*`.
 - La identidad es propia (ultramar + lima + tinta). No copiar la estética de otros repositorios.
 - Los títulos usan Sora, el texto Inter y los importes JetBrains Mono (con `font-variant-numeric`).
@@ -119,8 +122,9 @@ Formato: Prettier, 100 columnas, comillas simples, parser Angular para HTML, 2 e
   `/plan-cuentas`). Para un reporte nuevo, reutilizar `EtReporteLayoutComponent`
   y `EtReportePreviewComponent` de `ui-reportes`, y sumar el repository en la
   librería de datos del módulo.
-- Fechas visibles: `dd-MM-yyyy` (ver regla global
-  `~/.config/opencode/rules/formatos.md`).
+- Fechas visibles en pantalla: `dd/MM/yyyy` mediante `fecha()` y `fechaHora()`
+  de `shared-api`. No usar `toLocaleDateString()` ni depender de la configuración
+  regional del equipo. Nombres de archivo: `dd-MM-yyyy`.
 
 ## Verificación
 

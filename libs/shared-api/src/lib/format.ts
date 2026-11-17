@@ -17,19 +17,69 @@ export function porcentaje(valor: number, decimales = 1): string {
   return `${valor.toFixed(decimales).replace('.', ',')}%`;
 }
 
-export function fecha(valor: string | Date): string {
+function dosDigitos(valor: number): string {
+  return String(valor).padStart(2, '0');
+}
+
+/** Normaliza una fecha ya formateada (`dd-MM-yyyy` o `dd/MM/yyyy`) a `dd/MM/yyyy`. */
+function fechaPreformateada(valor: string): string | null {
+  const partes = /^(\d{2})[/-](\d{2})[/-](\d{4})$/.exec(valor.trim());
+  if (!partes) {
+    return null;
+  }
+  const dia = Number(partes[1]);
+  const mes = Number(partes[2]);
+  if (dia < 1 || dia > 31 || mes < 1 || mes > 12) {
+    return null;
+  }
+  return `${partes[1]}/${partes[2]}/${partes[3]}`;
+}
+
+function parsearFecha(valor: string | Date): Date | null {
   const fechaValor =
     valor instanceof Date
       ? valor
       : new Date(/^\d{4}-\d{2}-\d{2}$/.test(valor) ? `${valor}T00:00:00` : valor);
+  return Number.isNaN(fechaValor.getTime()) ? null : fechaValor;
+}
 
-  if (Number.isNaN(fechaValor.getTime())) {
+/**
+ * Fecha visible en `dd/MM/yyyy`, construida manualmente para no depender de la
+ * configuración regional ni de la zona horaria del equipo.
+ */
+export function fecha(valor: string | Date): string {
+  if (typeof valor === 'string') {
+    const normalizada = fechaPreformateada(valor);
+    if (normalizada) {
+      return normalizada;
+    }
+  }
+
+  const fechaValor = parsearFecha(valor);
+  if (!fechaValor) {
     return typeof valor === 'string' ? valor : '';
   }
 
-  const dia = String(fechaValor.getDate()).padStart(2, '0');
-  const mes = String(fechaValor.getMonth() + 1).padStart(2, '0');
-  return `${dia}-${mes}-${fechaValor.getFullYear()}`;
+  const dia = dosDigitos(fechaValor.getDate());
+  const mes = dosDigitos(fechaValor.getMonth() + 1);
+  return `${dia}/${mes}/${fechaValor.getFullYear()}`;
+}
+
+/** Fecha y hora visibles en `dd/MM/yyyy HH:mm`, sin depender del equipo. */
+export function fechaHora(valor: string | Date): string {
+  const fechaValor = parsearFecha(valor);
+  if (!fechaValor) {
+    return fecha(valor);
+  }
+
+  const horas = dosDigitos(fechaValor.getHours());
+  const minutos = dosDigitos(fechaValor.getMinutes());
+  return `${fecha(fechaValor)} ${horas}:${minutos}`;
+}
+
+/** Fecha para nombres de archivo: `dd-MM-yyyy` (la barra no es válida en un nombre). */
+export function fechaArchivo(valor: string | Date): string {
+  return fecha(valor).replace(/\//g, '-');
 }
 
 export function mesCorto(mes: number): string {

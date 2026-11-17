@@ -4,11 +4,11 @@
       <span class="et-eyebrow">{{ datos().titulo }}</span>
       <h2 id="reporte-preview-titulo">{{ datos().negocio }}</h2>
       @if (datos().subtitulo) {
-        <p class="reporte-preview__subtitulo">{{ datos().subtitulo }}</p>
+        <p class="reporte-preview__subtitulo">{{ subtitulo() }}</p>
       }
     </div>
     <div class="reporte-preview__meta">
-      <span class="et-mono">{{ datos().generadoEn }}</span>
+      <span class="et-mono">{{ fechaGeneracion() }}</span>
       <span class="et-badge et-badge--outline">{{ datos().totalFilas }} filas</span>
     </div>
   </header>

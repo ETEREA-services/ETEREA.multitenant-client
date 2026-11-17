@@ -8,7 +8,7 @@ import {
   Validators,
 } from '@angular/forms';
 import { Router } from '@angular/router';
-import { AuthStore } from '@eterea/shared-api';
+import { AuthStore, fechaHora } from '@eterea/shared-api';
 import { EtIconComponent, EtPageHeaderComponent } from '@eterea/ui-layout';
 
 /** La nueva contraseña debe ser distinta de la actual y coincidir con su repetición. */
@@ -83,10 +83,7 @@ export class CambiarPasswordComponent {
   }
 
   protected formatearVencimiento(valor: string): string {
-    return new Date(valor).toLocaleString('es-AR', {
-      dateStyle: 'short',
-      timeStyle: 'short',
-    });
+    return fechaHora(valor);
   }
 
   private mensajeError(error: unknown): string {

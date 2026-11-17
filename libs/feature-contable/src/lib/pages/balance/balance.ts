@@ -1,9 +1,5 @@
 import { Component, effect, inject, signal } from '@angular/core';
-import {
-  FormBuilder,
-  ReactiveFormsModule,
-  Validators,
-} from '@angular/forms';
+import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { finalize } from 'rxjs';
 import {
   BALANCE_REPORTE_REPOSITORY,
@@ -13,29 +9,20 @@ import {
   ReporteApiError,
 } from '@eterea/contable-data-access';
 import { ReporteDatos } from '@eterea/reporte-shared';
-import { ContextoStore } from '@eterea/shared-api';
-import {
-  EtReporteLayoutComponent,
-  descargarBlob,
-  imprimirPdf,
-} from '@eterea/ui-reportes';
+import { ContextoStore, fechaArchivo } from '@eterea/shared-api';
+import { EtDateInputComponent } from '@eterea/ui-layout';
+import { EtReporteLayoutComponent, descargarBlob, imprimirPdf } from '@eterea/ui-reportes';
 
-/** Fecha de hoy en ISO local (`yyyy-MM-dd`), el valor que usa `<input type="date">`. */
+/** Fecha de hoy en ISO local (`yyyy-MM-dd`), el valor que usan los campos de fecha. */
 function fechaHoyIso(fecha = new Date()): string {
   const dia = String(fecha.getDate()).padStart(2, '0');
   const mes = String(fecha.getMonth() + 1).padStart(2, '0');
   return `${fecha.getFullYear()}-${mes}-${dia}`;
 }
 
-/** Convierte una fecha ISO a `dd-MM-yyyy` para textos visibles y nombres de archivo. */
-function fechaVisible(iso: string): string {
-  const [anio, mes, dia] = iso.slice(0, 10).split('-');
-  return anio && mes && dia ? `${dia}-${mes}-${anio}` : iso;
-}
-
 @Component({
   selector: 'et-contable-balance',
-  imports: [ReactiveFormsModule, EtReporteLayoutComponent],
+  imports: [ReactiveFormsModule, EtReporteLayoutComponent, EtDateInputComponent],
   templateUrl: './balance.html',
   styleUrl: './balance.css',
 })
@@ -190,9 +177,8 @@ export class BalancePageComponent {
       .subscribe({
         next: (monedas) => {
           this.monedas.set(monedas);
-          const base = monedas.find((moneda) => moneda.esBase)?.monedaId
-            ?? monedas[0]?.monedaId
-            ?? 1;
+          const base =
+            monedas.find((moneda) => moneda.esBase)?.monedaId ?? monedas[0]?.monedaId ?? 1;
           const actual = this.filtros.getRawValue();
           if (!monedas.some((moneda) => moneda.monedaId === actual.monedaRegistroId)) {
             this.filtros.patchValue({ monedaRegistroId: base });
@@ -251,8 +237,8 @@ export class BalancePageComponent {
       .replace(/(^-+|-+$)/g, '');
     const valor = this.filtros.getRawValue();
     const codigo = datos?.codigo ?? 'balance-general';
-    const desde = fechaVisible(valor.desde);
-    const hasta = fechaVisible(valor.hasta);
+    const desde = fechaArchivo(valor.desde);
+    const hasta = fechaArchivo(valor.hasta);
     return `${codigo}-${negocio || 'negocio'}-${desde}-${hasta}.${extension}`;
   }
 }

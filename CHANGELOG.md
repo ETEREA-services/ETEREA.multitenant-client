@@ -5,6 +5,33 @@ Todos los cambios relevantes de este proyecto se documentan en este archivo.
 El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/)
 y el versionado adopta [SemVer](https://semver.org/lang/es/).
 
+## [0.4.0] - 2026-11-17
+
+### Añadido
+
+- `ui-layout`: componente `et-date-input` (`ControlValueAccessor`) con texto
+  enmascarado `dd/MM/aaaa`, botón de calendario sobre el selector nativo
+  (`showPicker` con fallback), estado inválido y atributos `aria-*`; el
+  formulario sigue recibiendo el valor ISO `yyyy-MM-dd`.
+- `shared-api`: helpers `fechaHora()` (`dd/MM/yyyy HH:mm`) y `fechaArchivo()`
+  (`dd-MM-yyyy` para nombres de archivo) junto a `fecha()`.
+- Sesión: la pantalla de selección de contexto muestra el usuario activo
+  (iniciales, nombre y login) y un botón para alternar el tema claro/oscuro.
+
+### Cambiado
+
+- `shared-api`: `fecha()` devuelve `dd/MM/yyyy` en lugar de `dd-MM-yyyy` y
+  normaliza fechas ya formateadas con guiones o barras; las pantallas de
+  ejercicios, usuarios, cambio de contraseña y la vista previa de reportes usan
+  ese formato visible.
+- Contable: los campos de fecha de balance y ejercicios usan `et-date-input`
+  en lugar de `<input type="date">`; los payloads contra el backend conservan
+  el formato ISO.
+- `ui-reportes`: la vista previa normaliza `subtitulo` y `generadoEn` a
+  `dd/MM/yyyy` aunque el backend los entregue con guiones.
+- docs: `AGENTS.md` documenta `et-date-input` y la regla de fechas visibles con
+  `fecha()`/`fechaHora()`.
+
 ## [0.3.0] - 2026-11-16
 
 ### Añadido

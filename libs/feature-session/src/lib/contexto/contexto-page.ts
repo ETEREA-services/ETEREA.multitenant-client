@@ -1,7 +1,7 @@
 import { Component, computed, inject } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AuthStore, ContextoSeleccion, ContextoStore } from '@eterea/shared-api';
-import { EtIconComponent, EtPageHeaderComponent } from '@eterea/ui-layout';
+import { EtIconComponent, EtPageHeaderComponent, ThemeService } from '@eterea/ui-layout';
 import { ContextoSelectorComponent } from './contexto-selector';
 
 /**
@@ -19,6 +19,11 @@ export class ContextoPageComponent {
   private readonly auth = inject(AuthStore);
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
+
+  protected readonly tema = inject(ThemeService);
+  protected readonly usuarioNombre = this.auth.nombreVisible;
+  protected readonly usuarioLogin = computed(() => this.auth.usuario()?.login ?? '');
+  protected readonly usuarioIniciales = this.auth.iniciales;
 
   protected readonly empresas = this.contextoStore.empresas;
   protected readonly empresaActivaId = computed(

@@ -8,6 +8,7 @@ import {
   PasswordTemporal,
   Usuario,
 } from '@eterea/administrador-data-access';
+import { fechaHora } from '@eterea/shared-api';
 import { EtEmptyStateComponent, EtIconComponent, EtPageHeaderComponent } from '@eterea/ui-layout';
 
 interface FormularioUsuario {
@@ -211,22 +212,7 @@ export class UsuariosPageComponent implements OnInit {
   }
 
   protected fecha(valor?: string | null): string {
-    if (!valor) {
-      return 'Nunca';
-    }
-
-    const fechaValor = new Date(valor);
-    if (Number.isNaN(fechaValor.getTime())) {
-      return valor;
-    }
-
-    const dia = String(fechaValor.getDate()).padStart(2, '0');
-    const mes = String(fechaValor.getMonth() + 1).padStart(2, '0');
-    const anio = fechaValor.getFullYear();
-    const horas = String(fechaValor.getHours()).padStart(2, '0');
-    const minutos = String(fechaValor.getMinutes()).padStart(2, '0');
-
-    return `${dia}-${mes}-${anio} ${horas}:${minutos}`;
+    return valor ? fechaHora(valor) : 'Nunca';
   }
 
   private ordenar(usuarios: ReadonlyArray<Usuario>): ReadonlyArray<Usuario> {

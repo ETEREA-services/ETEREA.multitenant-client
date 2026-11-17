@@ -48,7 +48,7 @@ apps/
 └── administrador/              # host de administración global
 libs/
 ├── shared-api/                 # sesión, tenant, interceptores, tokens, env y formato
-├── ui-layout/                  # sistema de diseño: shell, iconos, page header
+├── ui-layout/                  # sistema de diseño: shell, iconos, page header, date input
 ├── feature-session/            # login, cambio de contraseña y selector de contexto
 ├── contable-data-access/       # modelos y contratos + repositorios HTTP contables
 ├── feature-contable/           # rutas y páginas del módulo contable
@@ -180,7 +180,11 @@ Identidad propia: **tinta editorial + ultramar eléctrico + lima ácida**.
   campos, badges, tablas y utilidades.
 - Shell responsive en `libs/ui-layout/src/lib/shell`, con navegación agrupada,
   contexto empresa/negocio, usuario y cambio de tema.
-- Componentes compartidos: `et-icon`, `et-page-header`, `et-empty-state`.
+- Componentes compartidos: `et-icon`, `et-page-header`, `et-empty-state` y
+  `et-date-input`. Los campos de fecha usan `et-date-input` (`dd/MM/aaaa`
+  visible, valor ISO `yyyy-MM-dd` en el formulario) y las fechas se muestran con
+  `fecha()` y `fechaHora()` de `shared-api`, sin depender de la configuración
+  regional del equipo.
 - Tipografías: Sora (títulos), Inter (texto) y JetBrains Mono (importes).
 
 Las reglas de uso están en [`AGENTS.md`](./AGENTS.md).
