@@ -8,8 +8,13 @@ import {
   EstadoEjercicio,
   normalizarErrorEjercicio,
 } from '@eterea/contable-data-access';
-import { AuthStore, ContextoStore } from '@eterea/shared-api';
-import { EtEmptyStateComponent, EtIconComponent, EtPageHeaderComponent } from '@eterea/ui-layout';
+import { AuthStore, ContextoStore, fecha } from '@eterea/shared-api';
+import {
+  EtEmptyStateComponent,
+  EtDateInputComponent,
+  EtIconComponent,
+  EtPageHeaderComponent,
+} from '@eterea/ui-layout';
 
 type ModoFormulario = 'crear' | 'editar';
 type TipoConfirmacion = 'bloquear' | 'desbloquear' | 'eliminar';
@@ -33,7 +38,13 @@ const FORMULARIO_VACIO: FormularioEjercicio = {
 
 @Component({
   selector: 'et-contable-ejercicios',
-  imports: [FormsModule, EtPageHeaderComponent, EtEmptyStateComponent, EtIconComponent],
+  imports: [
+    FormsModule,
+    EtDateInputComponent,
+    EtPageHeaderComponent,
+    EtEmptyStateComponent,
+    EtIconComponent,
+  ],
   templateUrl: './ejercicios.html',
   styleUrl: './ejercicios.css',
 })
@@ -300,12 +311,8 @@ export class EjerciciosPageComponent {
     this.aviso.set(null);
   }
 
-  protected fechaVisible(fecha: string): string {
-    const [anio, mes, dia] = fecha.slice(0, 10).split('-');
-    if (!anio || !mes || !dia) {
-      return fecha;
-    }
-    return `${dia}-${mes}-${anio}`;
+  protected fechaVisible(valor: string): string {
+    return fecha(valor);
   }
 
   protected estadoEtiqueta(estado: EstadoEjercicio): string {

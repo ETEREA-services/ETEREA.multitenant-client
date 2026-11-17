@@ -27,7 +27,7 @@ export interface ReporteDatos {
   codigo: string;
   titulo: string;
   negocio: string;
-  /** Fecha de generación en formato `dd-MM-yyyy`. */
+  /** Fecha de generación provista por el backend en formato `dd-MM-yyyy`. */
   generadoEn: string;
   /** Período, monedas u otra línea de contexto debajo del título. */
   subtitulo?: string;

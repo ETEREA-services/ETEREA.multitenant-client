@@ -21,12 +21,12 @@
   <form reporteFiltros class="balance__filtros" [formGroup]="filtros" (ngSubmit)="cargar()">
     <label class="et-field balance__campo">
       <span class="et-label">Desde</span>
-      <input class="et-input" type="date" formControlName="desde" autocomplete="off" />
+      <et-date-input formControlName="desde" [requerido]="true" />
     </label>
 
     <label class="et-field balance__campo">
       <span class="et-label">Hasta</span>
-      <input class="et-input" type="date" formControlName="hasta" autocomplete="off" />
+      <et-date-input formControlName="hasta" [requerido]="true" />
     </label>
 
     <label class="et-field balance__campo">
@@ -65,8 +65,6 @@
       Incluir asientos de inflación
     </label>
 
-    <button class="et-btn et-btn--primary" type="submit" [disabled]="cargando()">
-      Consultar
-    </button>
+    <button class="et-btn et-btn--primary" type="submit" [disabled]="cargando()">Consultar</button>
   </form>
 </et-reporte-layout>

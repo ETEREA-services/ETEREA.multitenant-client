@@ -195,23 +195,15 @@
       <div class="ejercicios__fechas">
         <label class="et-field">
           <span class="et-label">Desde</span>
-          <input
-            class="et-input"
+          <et-date-input
             name="fechaInicio"
-            type="date"
-            required
             [(ngModel)]="formulario.fechaInicio"
+            [requerido]="true"
           />
         </label>
         <label class="et-field">
           <span class="et-label">Hasta</span>
-          <input
-            class="et-input"
-            name="fechaFin"
-            type="date"
-            required
-            [(ngModel)]="formulario.fechaFin"
-          />
+          <et-date-input name="fechaFin" [(ngModel)]="formulario.fechaFin" [requerido]="true" />
         </label>
       </div>
 

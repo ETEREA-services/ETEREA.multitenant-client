@@ -1,16 +1,9 @@
 import { Component, effect, inject, signal } from '@angular/core';
 import { finalize } from 'rxjs';
-import {
-  PLAN_CUENTAS_REPORTE_REPOSITORY,
-  ReporteApiError,
-} from '@eterea/contable-data-access';
+import { PLAN_CUENTAS_REPORTE_REPOSITORY, ReporteApiError } from '@eterea/contable-data-access';
 import { ReporteDatos } from '@eterea/reporte-shared';
 import { ContextoStore } from '@eterea/shared-api';
-import {
-  EtReporteLayoutComponent,
-  descargarBlob,
-  imprimirPdf,
-} from '@eterea/ui-reportes';
+import { EtReporteLayoutComponent, descargarBlob, imprimirPdf } from '@eterea/ui-reportes';
 
 @Component({
   selector: 'et-contable-reporte-plan-cuentas',
@@ -126,7 +119,7 @@ export class PlanCuentasReportePageComponent {
       .toLowerCase()
       .replace(/[^a-z0-9]+/g, '-')
       .replace(/(^-+|-+$)/g, '');
-    const fecha = datos?.generadoEn ?? '';
+    const fecha = (datos?.generadoEn ?? '').replace(/\//g, '-');
 
     return `plan-cuentas-${negocio || 'negocio'}-${fecha}.pdf`;
   }
