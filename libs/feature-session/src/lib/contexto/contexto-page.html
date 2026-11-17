@@ -1,3 +1,25 @@
+<div class="contexto-topbar">
+  <p
+    class="contexto-user"
+    [attr.aria-label]="'Sesión iniciada como ' + usuarioNombre() + ' (' + usuarioLogin() + ')'"
+  >
+    <span class="contexto-user__avatar" aria-hidden="true">{{ usuarioIniciales() }}</span>
+    <span class="contexto-user__text">
+      <strong>{{ usuarioNombre() }}</strong>
+      <small>{{ usuarioLogin() }}</small>
+    </span>
+  </p>
+
+  <button
+    type="button"
+    class="contexto-topbar__theme"
+    [attr.aria-label]="tema.esOscuro() ? 'Activar tema claro' : 'Activar tema oscuro'"
+    (click)="tema.alternar()"
+  >
+    <et-icon [name]="tema.esOscuro() ? 'sun' : 'moon'" [size]="18" />
+  </button>
+</div>
+
 <et-page-header
   eyebrow="Contexto"
   title="Elegí empresa y negocio"

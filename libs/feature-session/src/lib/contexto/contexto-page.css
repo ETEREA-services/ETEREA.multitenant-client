@@ -6,6 +6,90 @@
   padding: clamp(1.6rem, 4vw, 3.5rem) clamp(1.1rem, 3vw, 2.5rem) 3.5rem;
 }
 
+.contexto-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1.1rem;
+}
+
+.contexto-user {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  min-width: 0;
+  margin: 0;
+  padding: 0.3rem 0.85rem 0.3rem 0.3rem;
+  border: 1px solid var(--et-line);
+  border-radius: var(--et-radius-pill);
+  background: var(--et-surface);
+}
+
+.contexto-user__avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  flex: none;
+  border-radius: 50%;
+  background: var(--et-primary-soft);
+  color: var(--et-primary);
+  font-size: 0.67rem;
+  font-weight: 700;
+}
+
+.contexto-user__text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.contexto-user__text strong {
+  overflow: hidden;
+  color: var(--et-text);
+  font-size: 0.78rem;
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.contexto-user__text small {
+  overflow: hidden;
+  color: var(--et-text-mute);
+  font-size: 0.68rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.contexto-topbar__theme {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  flex: none;
+  border: 1px solid var(--et-line);
+  border-radius: 10px;
+  background: var(--et-surface);
+  color: var(--et-text-soft);
+  cursor: pointer;
+  transition:
+    color var(--et-fast) var(--et-ease),
+    border-color var(--et-fast) var(--et-ease);
+}
+
+.contexto-topbar__theme:hover {
+  border-color: var(--et-line-strong);
+  color: var(--et-text);
+}
+
+.contexto-topbar__theme:focus-visible {
+  outline: none;
+  box-shadow: var(--et-ring);
+}
+
 .contexto-panel {
   min-height: 18rem;
   padding: clamp(1rem, 2.5vw, 1.5rem);
