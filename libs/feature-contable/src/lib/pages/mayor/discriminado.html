@@ -1,0 +1,109 @@
+<et-reporte-layout
+  eyebrow="Consultas"
+  titulo="Mayor Discriminado"
+  descripcion="Movimientos de varias cuentas en un período, con comprobante, asiento y proveedor."
+  [datos]="datos()"
+  [cargando]="cargando()"
+  [error]="error()"
+  [sinPermiso]="sinPermiso()"
+  [descargando]="descargando()"
+  [exportando]="exportando()"
+  [mostrarExportarXlsx]="true"
+  tituloVacio="El mayor discriminado está vacío"
+  descripcionVacio="Probá con otras cuentas o rango de fechas."
+  iconoVacio="book"
+  (actualizar)="cargar()"
+  (reintentar)="cargar()"
+  (descargar)="descargar()"
+  (imprimir)="imprimir()"
+  (exportar)="exportarXlsx()"
+>
+  <form
+    reporteFiltros
+    class="discriminado__filtros"
+    [formGroup]="filtros"
+    (ngSubmit)="cargar()"
+  >
+    <div class="et-field discriminado__cuentas">
+      <span class="et-label">Cuentas</span>
+      <div class="discriminado__acciones">
+        <button class="et-btn et-btn--ghost" type="button" (click)="abrirBuscador()">
+          <et-icon name="plus" [size]="16" />
+          Agregar cuenta
+        </button>
+        @if (cuentas().length > 0) {
+          <button class="et-btn et-btn--ghost" type="button" (click)="vaciarCuentas()">
+            Vaciar
+          </button>
+        }
+        <span class="et-muted discriminado__contador">
+          {{ cuentas().length }} seleccionada{{ cuentas().length === 1 ? '' : 's' }}
+        </span>
+      </div>
+
+      @if (cuentas().length === 0) {
+        <p class="et-muted">Seleccioná al menos una cuenta para consultar.</p>
+      } @else {
+        <ul class="discriminado__chips">
+          @for (cuenta of cuentas(); track cuenta.numeroCuenta) {
+            <li class="discriminado__chip">
+              <span>{{ cuenta.descripcion }}</span>
+              <button
+                type="button"
+                class="discriminado__quitar"
+                [attr.aria-label]="'Quitar ' + cuenta.descripcion"
+                (click)="quitarCuenta(cuenta.numeroCuenta)"
+              >
+                <et-icon name="close" [size]="13" />
+              </button>
+            </li>
+          }
+        </ul>
+      }
+
+      @if (avisoSeleccion(); as aviso) {
+        <p class="discriminado__aviso" role="status">{{ aviso }}</p>
+      }
+    </div>
+
+    <label class="et-field discriminado__campo">
+      <span class="et-label">Desde</span>
+      <et-date-input formControlName="desde" [requerido]="true" />
+    </label>
+
+    <label class="et-field discriminado__campo">
+      <span class="et-label">Hasta</span>
+      <et-date-input formControlName="hasta" [requerido]="true" />
+    </label>
+
+    <label class="et-field discriminado__campo">
+      <span class="et-label">Registrado en</span>
+      <et-moneda-select
+        formControlName="monedaRegistroId"
+        [monedas]="monedas()"
+        [deshabilitado]="cargandoMonedas()"
+      />
+    </label>
+
+    <label class="et-field discriminado__campo">
+      <span class="et-label">Expresado en</span>
+      <et-moneda-select
+        formControlName="monedaExpresionId"
+        [monedas]="monedas()"
+        [deshabilitado]="cargandoMonedas()"
+      />
+    </label>
+
+    <button class="et-btn et-btn--primary" type="submit" [disabled]="cargando()">
+      Consultar
+    </button>
+  </form>
+</et-reporte-layout>
+
+@if (buscadorAbierto()) {
+  <et-cuenta-lookup
+    [textoInicial]="textoInicial()"
+    (seleccionar)="agregarCuenta($event)"
+    (cerrar)="buscadorAbierto.set(false)"
+  />
+}

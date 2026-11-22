@@ -17,17 +17,5 @@ export interface BalanceFiltro {
   monedaExpresionId: number;
 }
 
-/** Moneda del catálogo del tenant. */
-export interface MonedaInfo {
-  monedaId: number;
-  nombre: string;
-  simbolo: string;
-  esBase: boolean;
-}
-
-export interface MonedasResponse {
-  monedas: readonly MonedaInfo[];
-}
-
 /** Alias para que la página no dependa del nombre del contrato de reportes. */
 export type BalanceDatos = ReporteDatos;

@@ -1,0 +1,75 @@
+<button
+  type="button"
+  class="cuenta-modal__scrim"
+  aria-label="Cerrar búsqueda de cuentas"
+  (click)="cerrar.emit()"
+></button>
+
+<section
+  #panel
+  class="cuenta-modal__panel"
+  role="dialog"
+  aria-modal="true"
+  aria-labelledby="cuenta-modal-title"
+  tabindex="-1"
+>
+  <header class="cuenta-modal__head">
+    <div class="cuenta-modal__text">
+      <span class="et-eyebrow">Cuentas contables</span>
+      <h2 id="cuenta-modal-title">Buscar cuenta</h2>
+      <p>Nombre, cuentas imputables, hasta 20 resultados.</p>
+    </div>
+    <button type="button" class="cuenta-modal__close" aria-label="Cerrar" (click)="cerrar.emit()">
+      <et-icon name="close" [size]="18" />
+    </button>
+  </header>
+
+  <div class="cuenta-modal__buscador">
+    <et-icon name="search" [size]="17" />
+    <input
+      #buscador
+      class="et-input"
+      type="search"
+      autocomplete="off"
+      placeholder="Escribí el nombre de la cuenta"
+      [value]="texto()"
+      (input)="alEscribir($event)"
+      (keydown)="alTeclear($event)"
+    />
+  </div>
+
+  @if (cargando()) {
+    <p class="et-muted cuenta-modal__estado" aria-live="polite">Buscando cuentas…</p>
+  } @else if (error(); as mensaje) {
+    <div class="cuenta-modal__estado" role="alert">
+      <p class="et-error">{{ mensaje }}</p>
+      <button class="et-btn et-btn--sm" type="button" (click)="reintentar()">Reintentar</button>
+    </div>
+  } @else if (resultados().length === 0) {
+    <p class="et-muted cuenta-modal__estado">
+      No hay cuentas imputables que coincidan con la búsqueda.
+    </p>
+  } @else {
+    <ul class="cuenta-modal__lista" role="listbox" aria-label="Cuentas encontradas">
+      @for (cuenta of resultados(); track cuenta.numeroCuenta; let i = $index) {
+        <li role="option" [attr.aria-selected]="i === activo()">
+          <button
+            class="cuenta-modal__item"
+            type="button"
+            [class.is-active]="i === activo()"
+            (click)="elegir(cuenta)"
+            (dblclick)="elegir(cuenta)"
+            (mouseenter)="activo.set(i)"
+          >
+            <span>{{ cuenta.descripcion }}</span>
+            <span class="cuenta-modal__codigo">{{ cuenta.numeroCuenta }}</span>
+          </button>
+        </li>
+      }
+    </ul>
+  }
+
+  <p class="cuenta-modal__ayuda">
+    Enter o doble clic para seleccionar · Esc para cerrar
+  </p>
+</section>

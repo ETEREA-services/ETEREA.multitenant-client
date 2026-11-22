@@ -2,7 +2,13 @@ import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { Observable, map } from 'rxjs';
 import { API_URL } from '@eterea/shared-api';
-import { Cuenta, CuentaInput, CuentaNodo, CuentaUpdateInput } from './cuenta.models';
+import {
+  Cuenta,
+  CuentaBusqueda,
+  CuentaInput,
+  CuentaNodo,
+  CuentaUpdateInput,
+} from './cuenta.models';
 import { CuentaRepository } from './cuenta.repository';
 
 /** Normaliza `cuentaMaestro`, que el backend puede devolver como `null`. */
@@ -34,6 +40,12 @@ export class CuentaHttpRepository implements CuentaRepository {
     return this.http
       .get<readonly CuentaNodo[]>(`${this.apiUrl}/cuenta/arbol`)
       .pipe(map((nodos) => nodos.map(normalizarNodo)));
+  }
+
+  buscar(texto: string): Observable<readonly CuentaBusqueda[]> {
+    return this.http.post<readonly CuentaBusqueda[]>(`${this.apiUrl}/cuenta/buscar`, {
+      texto,
+    });
   }
 
   obtenerDetalle(numeroCuenta: number): Observable<Cuenta> {

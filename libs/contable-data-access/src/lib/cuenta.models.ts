@@ -48,6 +48,16 @@ export interface CuentaUpdateInput {
   gastos: boolean;
 }
 
+/**
+ * Resultado de la búsqueda legacy (`POST /cuenta/buscar`).
+ * `descripcion` viene como `nombre (cuenta)`, igual que el legacy.
+ */
+export interface CuentaBusqueda {
+  numeroCuenta: number;
+  nombre: string;
+  descripcion: string;
+}
+
 /** Nodo del árbol devuelto por `GET /cuenta/arbol`. */
 export interface CuentaNodo {
   cuenta: Cuenta;

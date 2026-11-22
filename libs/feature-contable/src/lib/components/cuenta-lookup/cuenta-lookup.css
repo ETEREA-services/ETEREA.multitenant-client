@@ -1,0 +1,145 @@
+:host {
+  position: fixed;
+  inset: 0;
+  z-index: 110;
+  display: grid;
+  place-items: center;
+  padding: clamp(0.75rem, 3vw, 2rem);
+}
+
+.cuenta-modal__scrim {
+  position: absolute;
+  inset: 0;
+  border: 0;
+  background: rgba(5, 7, 15, 0.55);
+  backdrop-filter: blur(3px);
+  cursor: pointer;
+}
+
+.cuenta-modal__panel {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: min(100%, 38rem);
+  max-height: min(88vh, 46rem);
+  padding: clamp(1.1rem, 3vw, 1.6rem);
+  border: 1px solid var(--et-line);
+  border-radius: var(--et-radius-lg);
+  background: var(--et-surface);
+  box-shadow: var(--et-shadow-lg);
+}
+
+.cuenta-modal__panel:focus {
+  outline: none;
+}
+
+.cuenta-modal__head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 0.9rem;
+}
+
+.cuenta-modal__text {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  min-width: 0;
+}
+
+.cuenta-modal__text h2 {
+  font-size: 1.15rem;
+}
+
+.cuenta-modal__text p {
+  color: var(--et-text-mute);
+  font-size: 0.78rem;
+}
+
+.cuenta-modal__close {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  flex: none;
+  border: 1px solid var(--et-line);
+  border-radius: 10px;
+  background: var(--et-surface);
+  color: var(--et-text-soft);
+  cursor: pointer;
+}
+
+.cuenta-modal__close:hover {
+  border-color: var(--et-line-strong);
+  color: var(--et-text);
+}
+
+.cuenta-modal__buscador {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.7rem;
+  color: var(--et-text-mute);
+}
+
+.cuenta-modal__buscador .et-input {
+  width: 100%;
+  padding-left: 0.6rem;
+}
+
+.cuenta-modal__lista {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  margin: 0;
+  padding: 0;
+  overflow-y: auto;
+  list-style: none;
+}
+
+.cuenta-modal__item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  width: 100%;
+  padding: 0.55rem 0.65rem;
+  border: 1px solid transparent;
+  border-radius: 10px;
+  background: transparent;
+  color: var(--et-text);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.cuenta-modal__item:hover,
+.cuenta-modal__item.is-active {
+  border-color: var(--et-primary-soft);
+  background: var(--et-primary-soft);
+}
+
+.cuenta-modal__codigo {
+  color: var(--et-text-mute);
+  font-family: var(--et-font-mono);
+  font-size: 0.78rem;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.cuenta-modal__estado {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.8rem 0;
+}
+
+.cuenta-modal__ayuda {
+  margin-top: 0.8rem;
+  color: var(--et-text-mute);
+  font-size: 0.72rem;
+}
