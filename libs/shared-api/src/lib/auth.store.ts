@@ -46,6 +46,11 @@ export class AuthStore {
   readonly error = this._error.asReadonly();
 
   readonly autenticado = computed(() => this._usuario() !== null && this._accessToken() !== null);
+  /**
+   * Verdadero mientras se intenta restaurar la sesión al recargar la página.
+   * La app lo usa para mostrar un splash en lugar de una pantalla vacía.
+   */
+  readonly restaurando = computed(() => !this._restaurado() && !this.autenticado());
   readonly usuarioId = computed(() => this._usuario()?.usuarioId ?? null);
   readonly esAdministrador = computed(() => this._usuario()?.administrador === true);
   readonly passwordChangeRequired = computed(() => this._usuario()?.mustChangePassword === true);
