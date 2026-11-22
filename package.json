@@ -1,6 +1,6 @@
 {
   "name": "eterea.multitenant-client",
-  "version": "0.4.0",
+  "version": "0.5.0",
   "description": "Cliente Angular multiempresa de Eterea con m\u00f3dulo contable",
   "scripts": {
     "ng": "ng",
