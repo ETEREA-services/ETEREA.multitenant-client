@@ -4,7 +4,8 @@ import { Observable, catchError, map } from 'rxjs';
 import { ReporteDatos } from '@eterea/reporte-shared';
 import { API_URL } from '@eterea/shared-api';
 import { reporteErrorDesdeHttp } from './plan-cuentas-reporte-error';
-import { BalanceFiltro, MonedaInfo, MonedasResponse } from './balance-reporte.models';
+import { BalanceFiltro } from './balance-reporte.models';
+import { MonedaInfo, MonedasResponse } from './moneda.models';
 import { BalanceReporteRepository } from './balance-reporte.repository';
 
 /** Implementación HTTP del reporte de balance. */

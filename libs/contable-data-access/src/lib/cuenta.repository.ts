@@ -1,6 +1,12 @@
 import { InjectionToken } from '@angular/core';
 import { Observable } from 'rxjs';
-import { Cuenta, CuentaInput, CuentaNodo, CuentaUpdateInput } from './cuenta.models';
+import {
+  Cuenta,
+  CuentaBusqueda,
+  CuentaInput,
+  CuentaNodo,
+  CuentaUpdateInput,
+} from './cuenta.models';
 
 /**
  * Contrato de acceso a datos del plan de cuentas contra
@@ -12,6 +18,8 @@ import { Cuenta, CuentaInput, CuentaNodo, CuentaUpdateInput } from './cuenta.mod
 export interface CuentaRepository {
   listar(): Observable<readonly Cuenta[]>;
   arbol(): Observable<readonly CuentaNodo[]>;
+  /** Búsqueda legacy: nombre, imputables, orden por nombre, máximo 20. */
+  buscar(texto: string): Observable<readonly CuentaBusqueda[]>;
   obtenerDetalle(numeroCuenta: number): Observable<Cuenta>;
   crear(input: CuentaInput): Observable<Cuenta>;
   actualizar(numeroCuenta: number, input: CuentaUpdateInput): Observable<Cuenta>;

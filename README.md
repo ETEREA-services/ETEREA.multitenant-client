@@ -15,8 +15,9 @@
 Clientes Angular para operar la contabilidad y la administración de varias
 empresas desde un mismo espacio de trabajo. Incluye autenticación contra Brain,
 selección de contexto empresa → negocio y los primeros módulos operativos:
-plan de cuentas, ejercicios, coeficientes de inflación, balance e informes en
-Contable; empresas, negocios, usuarios y asignaciones en Administrador.
+plan de cuentas, ejercicios, coeficientes de inflación, balance, mayor, mayor
+discriminado e informes en Contable; empresas, negocios, usuarios y asignaciones
+en Administrador.
 
 ## Stack
 
@@ -75,9 +76,10 @@ libs/
   - `contextoGuard` exige empresa y negocio elegidos.
   - `API_URL`, `APP_ENV_INFO` y helpers de formato son transversales.
 - **`contable-data-access`** define los modelos y contratos contables, más sus
-  implementaciones HTTP contra `/api/tenant/core`: cuentas, ejercicios,
-  coeficientes de inflación, reporte de Plan de Cuentas y balance. `ContableRepository`
-  (snapshot del módulo) sigue sin implementación.
+  implementaciones HTTP contra `/api/tenant/core`: cuentas (incluida la búsqueda
+  de imputables), ejercicios, coeficientes de inflación, catálogo de monedas,
+  reporte de Plan de Cuentas, balance, mayor y mayor discriminado.
+  `ContableRepository` (snapshot del módulo) sigue sin implementación.
 - **`administrador-data-access`** define los modelos de empresa, negocio, usuario
   y asignaciones, el contrato `AdministradorRepository` y su implementación HTTP
   `AdministradorHttpRepository` contra `/api/brain/core`. El cliente de
@@ -127,6 +129,8 @@ Los límites están enforced por `@nx/enforce-module-boundaries` en
 | `/ejercicios`             | Ejercicios contables       | operativa   |
 | `/inflacion/coeficientes` | Coeficientes de inflación  | operativa   |
 | `/balance`                | Balance (informe)          | operativa   |
+| `/mayor`                  | Mayor de una cuenta        | operativa   |
+| `/mayor/discriminado`     | Mayor discriminado         | operativa   |
 | `/login`                  | Ingreso                    | operativa   |
 | `/empresas`               | Selector empresa → negocio | operativa   |
 | `/cambiar-password`       | Cambiar contraseña         | operativa   |
@@ -168,8 +172,11 @@ Los límites están enforced por `@nx/enforce-module-boundaries` en
 - El tenant viaja en `X-Tenant-Id`; el body no incluye `tenantId` ni `negocioId`.
 - `reporte-shared` define `ReporteDatos` y `ui-reportes` resuelve vista previa,
   descarga de PDF, impresión y exportación XLSX cuando el reporte la habilita.
-  Los reportes operativos son `/reportes/plan-cuentas` y el informe `/balance`,
-  que además elige moneda de registro y de expresión.
+  Los reportes operativos son `/reportes/plan-cuentas`, el informe `/balance` y
+  las consultas `/mayor` y `/mayor/discriminado`. Balance, Mayor y Mayor
+  discriminado eligen moneda de registro y de expresión desde el catálogo del
+  tenant; el Mayor muestra además un bloque con los controles de la consulta
+  (movimientos, excluidos, total por módulo y comprobantes sin tipo).
 
 ## Sistema de diseño
 
@@ -209,6 +216,10 @@ Listo:
 - Contable: balance general y por cuenta con rango de fechas, apertura, asientos
   de inflación, monedas de registro y expresión, vista previa, PDF, impresión y
   exportación XLSX.
+- Contable: consultas Mayor y Mayor discriminado con rango de fechas, monedas de
+  registro y expresión, vista previa, PDF, impresión y exportación XLSX; el
+  Mayor incluye saldo anterior opcional y controles de la consulta, y el
+  discriminado permite combinar varias cuentas.
 - Administrador: alta y edición de empresas y negocios (con `tenantId` generado
   en el cliente), listado de usuarios, blanqueo de contraseñas y asignaciones
   usuario–empresa / usuario–negocio con activación, desactivación y cascada.
@@ -217,7 +228,7 @@ Listo:
 Pendiente de implementar por pasos:
 
 1. Implementación HTTP de `ContableRepository` (snapshot del módulo contable).
-2. Asientos, mayor, períodos y centros de costo.
+2. Asientos, períodos y centros de costo.
 3. Pruebas unitarias de las capas de datos y de los cálculos contables.
 4. Pipelines de staging y producción.
 

@@ -1,0 +1,127 @@
+<et-reporte-layout
+  eyebrow="Consultas"
+  titulo="Mayor"
+  descripcion="Libro de una cuenta con saldo anterior, movimientos y saldo corrido."
+  [datos]="datos()?.reporte ?? null"
+  [cargando]="cargando()"
+  [error]="error()"
+  [sinPermiso]="sinPermiso()"
+  [descargando]="descargando()"
+  [exportando]="exportando()"
+  [mostrarExportarXlsx]="true"
+  [mostrarControl]="true"
+  tituloVacio="El mayor está vacío"
+  descripcionVacio="Probá con otra cuenta o rango de fechas."
+  iconoVacio="book"
+  (actualizar)="cargar()"
+  (reintentar)="cargar()"
+  (descargar)="descargar()"
+  (imprimir)="imprimir()"
+  (exportar)="exportarXlsx()"
+>
+  <form reporteFiltros class="mayor__filtros" [formGroup]="filtros" (ngSubmit)="cargar()">
+    <label class="et-field mayor__campo mayor__campo--cuenta">
+      <span class="et-label">Cuenta</span>
+      <div class="mayor__cuenta">
+        <input
+          class="et-input"
+          type="text"
+          readonly
+          placeholder="Elegí una cuenta…"
+          [class.is-invalid]="cuentaInvalida()"
+          [value]="cuentaTexto()"
+          (click)="abrirBuscador()"
+          (keydown)="alTeclearCuenta($event)"
+        />
+        <button class="et-btn et-btn--ghost" type="button" (click)="abrirBuscador()">
+          <et-icon name="search" [size]="16" />
+          Buscar
+        </button>
+      </div>
+      @if (cuentaInvalida()) {
+        <span class="et-error">Elegí una cuenta contable.</span>
+      }
+    </label>
+
+    <label class="et-field mayor__campo">
+      <span class="et-label">Desde</span>
+      <et-date-input formControlName="desde" [requerido]="true" />
+    </label>
+
+    <label class="et-field mayor__campo">
+      <span class="et-label">Hasta</span>
+      <et-date-input formControlName="hasta" [requerido]="true" />
+    </label>
+
+    <label class="mayor__check">
+      <input type="checkbox" formControlName="sinSaldoAnterior" />
+      Sin saldo anterior
+    </label>
+
+    <label class="et-field mayor__campo">
+      <span class="et-label">Registrado en</span>
+      <et-moneda-select
+        formControlName="monedaRegistroId"
+        [monedas]="monedas()"
+        [deshabilitado]="cargandoMonedas()"
+      />
+    </label>
+
+    <label class="et-field mayor__campo">
+      <span class="et-label">Expresado en</span>
+      <et-moneda-select
+        formControlName="monedaExpresionId"
+        [monedas]="monedas()"
+        [deshabilitado]="cargandoMonedas()"
+      />
+    </label>
+
+    <button class="et-btn et-btn--primary" type="submit" [disabled]="cargando()">
+      Consultar
+    </button>
+  </form>
+
+  @if (datos(); as consulta) {
+    <details reporteControl class="et-card mayor__control">
+      <summary>Controles de la consulta</summary>
+      <div class="mayor__control-grid">
+        <div class="mayor__control-item">
+          <span class="et-label">Total movimientos</span>
+          <strong>{{ consulta.control.totalMovimientos }}</strong>
+        </div>
+        <div class="mayor__control-item">
+          <span class="et-label">Excluidos</span>
+          <strong>{{ consulta.control.movimientosExcluidos }}</strong>
+        </div>
+      </div>
+
+      @if (consulta.control.modulos.length > 0) {
+        <div class="mayor__control-bloque">
+          <span class="et-label">Total por módulo</span>
+          <ul class="mayor__control-lista">
+            @for (modulo of consulta.control.modulos; track modulo.moduloId) {
+              <li>
+                <span>{{ modulo.nombre || 'Sin módulo' }}</span>
+                <span class="et-amount">{{ modulo.cantidad }}</span>
+              </li>
+            }
+          </ul>
+        </div>
+      }
+
+      @if (consulta.control.comprobantesSinTipo.length > 0) {
+        <p class="et-error">
+          Comprobantes sin tipo: {{ consulta.control.comprobantesSinTipo.join(', ') }}
+        </p>
+      }
+    </details>
+  }
+</et-reporte-layout>
+
+@if (buscadorAbierto()) {
+  <et-cuenta-lookup
+    [textoInicial]="textoInicial()"
+    (seleccionar)="seleccionarCuenta($event)"
+    (cerrar)="buscadorAbierto.set(false)"
+  />
+}

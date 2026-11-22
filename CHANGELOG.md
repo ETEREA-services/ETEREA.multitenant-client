@@ -5,6 +5,48 @@ Todos los cambios relevantes de este proyecto se documentan en este archivo.
 El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/)
 y el versionado adopta [SemVer](https://semver.org/lang/es/).
 
+## [0.5.0] - 2026-11-22
+
+### Añadido
+
+- Contable: consulta **Mayor** (`/mayor`) sobre
+  `POST /api/tenant/core/reporte/mayor/{datos,pdf,xlsx}` con cuenta contable,
+  rango de fechas, opción de omitir el saldo anterior y monedas de registro y de
+  expresión; incluye vista previa, descarga de PDF, impresión y exportación
+  XLSX.
+- Contable: la consulta Mayor muestra un bloque plegable de controles con total
+  de movimientos, movimientos excluidos, total por módulo y comprobantes sin
+  tipo.
+- Contable: consulta **Mayor discriminado** (`/mayor/discriminado`) sobre
+  `POST /api/tenant/core/reporte/mayor-discriminado/{datos,pdf,xlsx}` con
+  selección múltiple de cuentas (chips para quitar una o vaciar la selección),
+  rango de fechas, monedas de registro y expresión, aviso cuando la selección
+  supera las 50 cuentas, vista previa, PDF, impresión y XLSX.
+- `contable-data-access`: repositorios HTTP `MayorReporteHttpRepository` y
+  `MayorDiscriminadoHttpRepository`, y `CuentaRepository.buscar`
+  (`POST /cuenta/buscar`) con hasta 20 cuentas imputables ordenadas por nombre.
+- `contable-data-access`: catálogo de monedas compartido `MonedaRepository`
+  (`GET /api/tenant/core/moneda`); `MonedaInfo` y `MonedasResponse` se mueven a
+  `moneda.models` y el balance los consume desde allí a través del mismo índice
+  público.
+- `feature-contable`: componentes `et-cuenta-lookup` (búsqueda de cuentas con
+  teclado, `Escape` y cierre en modal) y `et-moneda-select`
+  (`ControlValueAccessor` con el `monedaId` como valor del formulario).
+- `ui-reportes`: `EtReporteLayoutComponent` acepta contenido `[reporteControl]`
+  y el input `mostrarControl` para bloques de control propios del reporte.
+- `shared-api` y app Contable: `AuthStore.restaurando` y un splash "Restaurando
+  sesión…" que se muestra hasta que termina la primera navegación.
+
+### Cambiado
+
+- Shell de Contable: nuevo grupo de navegación **Consultas** con Mayor y Mayor
+  discriminado.
+- Las pantallas de Mayor y Mayor discriminado recargan el catálogo de monedas y
+  limpian la consulta al cambiar de negocio, reaccionando a `ContextoStore` en
+  lugar de cargar sólo en el alta del componente.
+- docs: README documenta las nuevas rutas, el grupo Consultas y los reportes
+  Mayor y Mayor discriminado.
+
 ## [0.4.0] - 2026-11-17
 
 ### Añadido

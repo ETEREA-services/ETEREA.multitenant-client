@@ -1,7 +1,8 @@
 import { InjectionToken } from '@angular/core';
 import { Observable } from 'rxjs';
 import { ReporteDatos } from '@eterea/reporte-shared';
-import { BalanceFiltro, MonedaInfo } from './balance-reporte.models';
+import { BalanceFiltro } from './balance-reporte.models';
+import { MonedaInfo } from './moneda.models';
 
 /**
  * Contrato del reporte de balance contra

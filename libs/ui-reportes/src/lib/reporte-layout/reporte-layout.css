@@ -6,6 +6,10 @@
   margin-bottom: 1rem;
 }
 
+.reporte__control {
+  margin-bottom: 1rem;
+}
+
 .reporte__filtros:empty {
   display: none;
 }

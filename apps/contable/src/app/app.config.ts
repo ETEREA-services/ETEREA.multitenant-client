@@ -19,6 +19,12 @@ import {
   CuentaHttpRepository,
   EJERCICIO_REPOSITORY,
   EjercicioHttpRepository,
+  MAYOR_DISCRIMINADO_REPORTE_REPOSITORY,
+  MAYOR_REPORTE_REPOSITORY,
+  MayorDiscriminadoHttpRepository,
+  MayorReporteHttpRepository,
+  MONEDA_REPOSITORY,
+  MonedaHttpRepository,
   PLAN_CUENTAS_REPORTE_REPOSITORY,
   PlanCuentasReporteHttpRepository,
 } from '@eterea/contable-data-access';
@@ -47,6 +53,18 @@ export const appConfig: ApplicationConfig = {
     {
       provide: BALANCE_REPORTE_REPOSITORY,
       useClass: BalanceReporteHttpRepository,
+    },
+    {
+      provide: MAYOR_REPORTE_REPOSITORY,
+      useClass: MayorReporteHttpRepository,
+    },
+    {
+      provide: MAYOR_DISCRIMINADO_REPORTE_REPOSITORY,
+      useClass: MayorDiscriminadoHttpRepository,
+    },
+    {
+      provide: MONEDA_REPOSITORY,
+      useClass: MonedaHttpRepository,
     },
     {
       provide: COEFICIENTE_INFLACION_REPOSITORY,

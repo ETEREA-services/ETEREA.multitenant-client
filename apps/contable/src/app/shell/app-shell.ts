@@ -69,6 +69,13 @@ export class AppShellComponent {
       ],
     },
     {
+      label: 'Consultas',
+      items: [
+        { label: 'Mayor', path: '/mayor', icon: 'book' },
+        { label: 'Mayor discriminado', path: '/mayor/discriminado', icon: 'file' },
+      ],
+    },
+    {
       label: 'Informes',
       items: [{ label: 'Balance', path: '/balance', icon: 'chart' }],
     },

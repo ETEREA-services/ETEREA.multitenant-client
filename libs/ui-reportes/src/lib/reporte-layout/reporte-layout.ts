@@ -36,6 +36,7 @@ export class EtReporteLayoutComponent {
   readonly descargando = input(false);
   readonly exportando = input(false);
   readonly mostrarExportarXlsx = input(false);
+  readonly mostrarControl = input(false);
   readonly tituloVacio = input('El reporte está vacío');
   readonly descripcionVacio = input('No hay datos para los filtros seleccionados.');
   readonly iconoVacio = input<IconName>('file');

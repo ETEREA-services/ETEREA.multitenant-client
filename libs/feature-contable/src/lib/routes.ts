@@ -5,6 +5,8 @@ import {
   CoeficientesInflacionPageComponent,
   coeficientesPuedeSalirGuard,
 } from './pages/inflacion/coeficientes/coeficientes';
+import { MayorDiscriminadoPageComponent } from './pages/mayor/discriminado';
+import { MayorPageComponent } from './pages/mayor/mayor';
 import { CuentaPageComponent } from './pages/plan-cuentas/cuenta';
 import { PlanCuentasReportePageComponent } from './pages/reportes/plan-cuentas/plan-cuentas-reporte';
 
@@ -28,6 +30,12 @@ export const CONTABLE_ROUTES: Routes = [
     title: 'Plan de Cuentas · Contable',
   },
   { path: 'balance', component: BalancePageComponent, title: 'Balance · Contable' },
+  {
+    path: 'mayor/discriminado',
+    component: MayorDiscriminadoPageComponent,
+    title: 'Mayor discriminado · Contable',
+  },
+  { path: 'mayor', component: MayorPageComponent, title: 'Mayor · Contable' },
   { path: 'ejercicios', component: EjerciciosPageComponent, title: 'Ejercicios · Contable' },
   {
     path: 'inflacion/coeficientes',

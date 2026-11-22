@@ -48,6 +48,10 @@
 
 <div class="reporte__filtros"><ng-content select="[reporteFiltros]" /></div>
 
+@if (mostrarControl()) {
+  <div class="reporte__control"><ng-content select="[reporteControl]" /></div>
+}
+
 @if (error(); as mensaje) {
   <div class="reporte__alerta" role="alert">
     <div>
